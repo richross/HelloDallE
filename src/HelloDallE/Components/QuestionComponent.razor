@@ -1,0 +1,38 @@
+﻿@using HelloDallE.Models;
+@inject IDallEComms DallEComms
+
+<h3>QuestionComponent</h3>
+
+<div class="border border-primary text-center">
+    <h3>@Model.QuestionName</h3>
+    <div class="border border-2 rounded-3 border-black">
+        <div class="text-center">@Model.QuestionText</div>
+        <div class="container">
+            <div class="row">
+                @foreach (var Answer in Model.Answers)
+                {
+                    <div class="@sectionNumber">
+                        <button @onclick="(e => CaptureResponse(e, Answer.AnswerValue))" class="btn-primary btn-outline-success">@Answer.AnswerText</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public QuestionViewModel? Model { get; set; }
+    private string sectionNumber;
+
+    protected override void OnInitialized()
+    {
+        sectionNumber = "col-" + Convert.ToString(12 / Model.Answers.Count);
+        base.OnInitialized();
+    }
+
+    private void CaptureResponse(MouseEventArgs e, string value)
+    {
+        DallEComms.PromptText += Model.QuestionPrompt + " " + value;
+    }
+}

@@ -1,0 +1,44 @@
+﻿@page "/"
+@using HelloDallE.Models;
+@using HelloDallE.Services;
+
+@inject IDallEComms DallEComms
+@inject IDataService DataService
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+<input @bind="DallEComms.PromptText" /><button @onclick="SubmitPrompt">Submit</button><br/>
+<div class="container">
+    <div class="row">
+        @foreach (var Question in Questions)
+        {
+            <div class="@questionNumber">
+            <HelloDallE.Components.QuestionComponent Model="@Question">
+            </HelloDallE.Components.QuestionComponent>
+            </div>
+        }
+    </div>
+</div>
+
+@code{
+    private List<QuestionViewModel> Questions;
+    private string questionNumber = "col-6";
+
+    protected override void OnInitialized()
+    {
+        // DallEComms.PromptText = "Hello from Blazor";
+
+        Questions = DataService.Questions;
+    }
+
+    private void SubmitPrompt()
+    {
+        DallEComms.RequestImage();
+    }
+}
