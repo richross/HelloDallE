@@ -1,6 +1,12 @@
 ﻿namespace HelloDallE.Services
 {
-    public class ConfigurationSettings
+    public interface IAzureOpenAISettings
+    {
+        string ApiKey { get; set; }
+        string ResourceName { get; set; }
+    }
+
+    public class AzureOpenAISettings : IAzureOpenAISettings
     {
         //AOAI resource for prompting for the DallE Images
         public string ResourceName { get; set; }

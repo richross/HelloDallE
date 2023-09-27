@@ -1,18 +1,18 @@
 ﻿@using HelloDallE.Models;
 @inject IDallEComms DallEComms
 
-<h3>QuestionComponent</h3>
-
 <div class="border border-primary text-center">
-    <h3>@Model.QuestionName</h3>
+    <div class="bg-light">
+        <h3>@Model.QuestionName</h3>
+    </div>
     <div class="border border-2 rounded-3 border-black">
-        <div class="text-center">@Model.QuestionText</div>
+        <div class="text-center gap-lg-5">@Model.QuestionText</div>
         <div class="container">
             <div class="row">
                 @foreach (var Answer in Model.Answers)
                 {
-                    <div class="@sectionNumber">
-                        <button @onclick="(e => CaptureResponse(e, Answer.AnswerValue))" class="btn-primary btn-outline-success">@Answer.AnswerText</button>
+                    <div class="@sectionNumber d-grid">
+                        <button @onclick="(e => CaptureResponse(e, Answer.AnswerValue))" class="btn-primary btn-outline-success @Answer.IsActive">@Answer.AnswerText</button>
                     </div>
                 }
             </div>
@@ -33,6 +33,22 @@
 
     private void CaptureResponse(MouseEventArgs e, string value)
     {
-        DallEComms.PromptText += Model.QuestionPrompt + " " + value;
+        var promptString = $"{Model.QuestionPrompt}";
+
+        DallEComms.PromptText += promptString.Replace("{value}", value);
+
+        //set the button to active and confirm other buttons are not active.
+        foreach (var answer in Model.Answers)
+        {
+            if (answer.AnswerValue == value)
+            {
+                answer.IsActive = "active";
+            }
+            else
+            {
+                answer.IsActive = string.Empty;
+            }
+        }
+        
     }
 }

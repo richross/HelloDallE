@@ -27,9 +27,19 @@ namespace HelloDallE.Models
         public string LastContentUrl { get; set; }
         public string ApiKey { get; set; }
 
+        private IConfiguration configs;
+
+        public DallEComms(IConfiguration _configs)
+        {
+            configs = _configs;
+            ResourceName = configs["AzureOpenAI:ResourceName"];
+            ApiKey = configs["AzureOpenAI:ApiKey"];
+        }
+
         public async Task RequestImage()
         {
-            DallERequest content = new DallERequest(PromptText, "1024x1024");
+            //TODO: modify if we want to return more than 1 image for the request (user option).
+            DallERequest content = new DallERequest(PromptText, 1, "1024x1024");
             var jsonContent = JsonSerializer.Serialize(content);
             HttpContent httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
@@ -47,8 +57,7 @@ namespace HelloDallE.Models
 
                     // Set image src to contentUrl //TODO: where to place these properties.
                     LastContentUrl = contentUrl;
-                    //ViewData["imageGuess"] = contentUrl;
-
+                    //ViewData["imageGuess"] = contentUrl
                     return;
                 } 
             }

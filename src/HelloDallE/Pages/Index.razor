@@ -5,15 +5,10 @@
 @inject IDallEComms DallEComms
 @inject IDataService DataService
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Questions</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
-
-<input @bind="DallEComms.PromptText" /><button @onclick="SubmitPrompt">Submit</button><br/>
+<h1>DallE Image Generator Sample</h1>
+<InputTextArea @bind-Value="DallEComms.PromptText" class="col-12" /><button @onclick="SubmitPrompt">Submit</button><br/>
 <div class="container">
     <div class="row">
         @foreach (var Question in Questions)
@@ -25,6 +20,15 @@ Welcome to your new app.
         }
     </div>
 </div>
+<div class="alert-info">
+    Descriptive text that explains to the user how this works.
+</div>
+@if (DallEComms.LastContentUrl != null)
+{
+    <div>
+        <img src="@DallEComms.LastContentUrl" />
+    </div>
+}
 
 @code{
     private List<QuestionViewModel> Questions;

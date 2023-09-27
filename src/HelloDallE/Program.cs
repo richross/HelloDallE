@@ -3,6 +3,7 @@ using HelloDallE.Models;
 using HelloDallE.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<IDataService, DataService>();
+builder.Configuration.AddUserSecrets<AzureOpenAISettings>();
 builder.Services.AddScoped<IDallEComms, DallEComms>();
 
 var app = builder.Build();

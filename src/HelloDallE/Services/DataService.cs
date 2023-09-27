@@ -25,7 +25,7 @@ namespace HelloDallE.Services
                         new Answer() { AnswerText = "Cautious", AnswerValue = "cautious"},
                         new Answer() { AnswerText = "Optimistic", AnswerValue = "optimistic"}
                     },
-                    QuestionPrompt = "the image should reflect the overall mood of"
+                    QuestionPrompt = "The image should evoke a mood of {value}. "
 
                 },
                 new QuestionViewModel()
@@ -38,7 +38,7 @@ namespace HelloDallE.Services
                         new Answer() { AnswerText = "Red", AnswerValue = "Red"},
                         new Answer() { AnswerText = "Green", AnswerValue = "Green"}
                     },
-                    QuestionPrompt = "the image should be based on the primary color of"
+                    QuestionPrompt = "The image should be based on the primary color of {value}. "
                 }
             };
         }
