@@ -8,7 +8,9 @@
 <PageTitle>Questions</PageTitle>
 
 <h1>DallE Image Generator Sample</h1>
-<InputTextArea @bind-Value="DallEComms.PromptText" class="col-12" /><button @onclick="SubmitPrompt">Submit</button><br/>
+<div class="alert-info">
+    Descriptive text that explains to the user how this works.
+</div>
 <div class="container">
     <div class="row">
         @foreach (var Question in Questions)
@@ -20,11 +22,11 @@
         }
     </div>
 </div>
-<div class="alert-info">
-    Descriptive text that explains to the user how this works.
-</div>
+<InputTextArea @bind-Value="DallEComms.PromptText" class="col-12" /><button @onclick="SubmitPrompt">Submit</button><br/>
+
 @if (DallEComms.LastContentUrl != null)
 {
+    <div id="ImagePromptText">@ImagePromptText</div>
     <div>
         <img src="@DallEComms.LastContentUrl" />
     </div>
@@ -32,6 +34,7 @@
 
 @code{
     private List<QuestionViewModel> Questions;
+    private string ImagePromptText = "";
     private string questionNumber = "col-6";
 
     protected override void OnInitialized()
@@ -41,8 +44,24 @@
         Questions = DataService.Questions;
     }
 
-    private void SubmitPrompt()
+    private async Task SubmitPrompt()
     {
-        DallEComms.RequestImage();
+        //go get my image!
+        await DallEComms.RequestImage();
+        
+        //save the prompt text for display.
+        ImagePromptText = DallEComms.PromptText;
+
+        //clear the text box of the prompt.
+        DallEComms.PromptText = string.Empty;
+
+        // clear QuestionComponent formatting on buttons
+        foreach (var question in Questions)
+        {
+            foreach (var answer in question.Answers)
+            {
+                answer.IsActive = false;
+            }
+        }
     }
 }
