@@ -25,6 +25,6 @@ jobs:
       run: |                 
         az account list
 
-    - name: Deploy Bicep file
-      run: |
-        az deployment sub create --location <location> --template-file <path-to-bicep-file>
+    # - name: Deploy Bicep file
+    #   run: |
+    #     az deployment sub create --location <location> --template-file <path-to-bicep-file>
