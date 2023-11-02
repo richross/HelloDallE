@@ -10,3 +10,4 @@ $objectId = az ad sp create --id $appId
 az role assignment create --role contributor --subscription $subscription --assignee-object-id $objectId --assignee-principal-type ServicePrincipal --scope /subscriptions/$subscription
 
 # Add Federated Credential to the App Registration
+az ad app federated-credential create --id $appId --parameters credential.json
