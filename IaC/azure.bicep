@@ -1,7 +1,7 @@
 param location string = 'eastus'
 param appName string = 'HelloDallE-App'
 param appServicePlanName string = 'app-PromptEngineeringWithDalle-dev'
-param storageAccountName string = 'imagesstorageaccount-rross'
+param storageAccountName string = 'imagesstorageaccountrross'
 param vnetName string = 'myvnet'
 param subnetName string = 'mysubnet'
 param privateEndpointName string = 'myprivateendpoint'
