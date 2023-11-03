@@ -1,25 +1,17 @@
 param location string = 'eastus'
-param appName string = 'myapp'
-param skuName string = 'F1'
-param storageAccountName string = 'mystorageaccount'
+param appName string = 'HelloDallE-App'
+param appServicePlanName string = 'app-PromptEngineeringWithDalle-dev'
+param storageAccountName string = 'imagesstorageaccount-rross'
 param vnetName string = 'myvnet'
 param subnetName string = 'mysubnet'
 param privateEndpointName string = 'myprivateendpoint'
 param tableName string = 'questions'
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
-  name: appName
-  location: location
-  sku: {
-    name: skuName
-    tier: 'Free'
-  }
-  properties: {
-    reserved: true
-  }
+resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' existing = {
+  name: appServicePlanName
 }
 
-resource appService 'Microsoft.Web/sites@2021-02-01' = {
+resource appService 'Microsoft.Web/sites@2022-09-01' = {
   name: appName
   location: location
   kind: 'app'
@@ -28,7 +20,7 @@ resource appService 'Microsoft.Web/sites@2021-02-01' = {
   }
 }
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageAccountName
   location: location
   kind: 'StorageV2'
@@ -49,7 +41,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' = {
   }
 }
 
-resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-02-01' = {
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
   name: privateEndpointName
   location: location
   properties: {
@@ -70,7 +62,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-02-01' = {
   }
 }
 
-resource table 'Microsoft.Storage/storageAccounts/tableServices/tables@2021-06-01' = {
+resource table 'Microsoft.Storage/storageAccounts/tableServices@2023-01-01' = {
   name: tableName
   parent: storageAccount
 }
