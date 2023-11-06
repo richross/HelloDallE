@@ -27,4 +27,4 @@ jobs:
 
     - name: Deploy Bicep file
       run: |
-        az deployment sub create -l eastus --template-file ./IaC/main.bicep
+        az deployment sub create -l eastus -n HelloDallE-Prod --template-file ./IaC/main.bicep
