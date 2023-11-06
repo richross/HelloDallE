@@ -1,22 +1,18 @@
-param location string = 'eastus'
+param appServicePlanId string
+param location string
 param appName string = 'HelloDallE-App'
-param appServicePlanName string = 'plan-PromptEngineeringWithDalle-dev'
 param storageAccountName string = 'imagestractrross'
 param vnetName string = 'myvnet'
 param subnetName string = 'mysubnet'
 param privateEndpointName string = 'myprivateendpoint'
 param tableName string = 'questions'
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' existing = {
-  name: appServicePlanName
-}
-
 resource appService 'Microsoft.Web/sites@2022-09-01' = {
   name: appName
   location: location
   kind: 'app'
   properties: {
-    serverFarmId: appServicePlan.id
+    serverFarmId: appServicePlanId
   }
 }
 

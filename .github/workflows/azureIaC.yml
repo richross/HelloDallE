@@ -24,8 +24,7 @@ jobs:
     - name: Confirm Login
       run: |                 
         az account list
-        az group create -n 'HelloDallE' -l 'eastus'
 
     - name: Deploy Bicep file
       run: |
-        az deployment group create -g HelloDallE --template-file ./IaC/azure.bicep
+        az deployment sub create -l eastus --template-file ./IaC/main.bicep
