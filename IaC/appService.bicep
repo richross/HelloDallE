@@ -1,6 +1,6 @@
 param appServicePlanId string
 param location string
-param appName string = 'HelloDallE-App'
+param appName string = 'HelloDallE-MTCPhilly'
 param storageAccountName string = 'imagestractrross'
 param vnetName string = 'myvnet'
 param subnetName string = 'mysubnet'
