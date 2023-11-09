@@ -5,58 +5,44 @@ using HelloDallE.Models;
 
 namespace HelloDallE.Services
 {
+    /// <summary>
+    /// Interface for DataService.
+    /// </summary>
     public interface IDataService
     {
         List<QuestionViewModel> Questions { get; set; }
+
+        void GetQuestions();
     }
 
+    /// <summary>
+    /// Service class for storing and retrieving questions from Azure Table Storage.
+    /// </summary>
     public class DataService : IDataService
     {
         private readonly IConfiguration _configuration;
         private AzureStorageAccountSettings azureStorageAccountSettings;
 
+        /// <summary>
+        /// List of questions.
+        /// </summary>
         public List<QuestionViewModel> Questions { get; set; }
 
+        /// <summary>
+        /// Constructor for DataService class.
+        /// </summary>
+        /// <param name="configuration">The IConfiguration instance for the application.</param>
         public DataService(IConfiguration configuration)
         {
-            #region old code waiting to be deleted
-
-            //Questions = new List<QuestionViewModel>()
-            //{
-            //    new QuestionViewModel()
-            //    {
-            //        QuestionName = "Mood",
-            //        QuestionText = "How is your mood today?",
-            //        Answers = new List<Answer>()
-            //        {
-            //            new Answer() { AnswerText = "Happy", AnswerValue = "happy"},
-            //            new Answer() { AnswerText = "Cautious", AnswerValue = "cautious"},
-            //            new Answer() { AnswerText = "Optimistic", AnswerValue = "optimistic"}
-            //        },
-            //        QuestionPrompt = "The image should evoke a mood of {value}. "
-
-            //    },
-            //    new QuestionViewModel()
-            //    {
-            //        QuestionName = "Color",
-            //        QuestionText = "Choose a color for inclusion in the image?",
-            //        Answers = new List<Answer>()
-            //        {
-            //            new Answer() { AnswerText = "Blue", AnswerValue = "Blue"},
-            //            new Answer() { AnswerText = "Red", AnswerValue = "Red"},
-            //            new Answer() { AnswerText = "Green", AnswerValue = "Green"}
-            //        },
-            //        QuestionPrompt = "The image should be based on the primary color of {value}. "
-            //    }
-            //};
-            #endregion
-
             Questions = new List<QuestionViewModel>();
             azureStorageAccountSettings = new AzureStorageAccountSettings();
 
             _configuration = configuration;
             _configuration.GetSection("AzureStorageAccountSettings").Bind(azureStorageAccountSettings);
+        }
 
+        public void GetQuestions()
+        {
             if (azureStorageAccountSettings != null)
             {
                 TableSharedKeyCredential creds = new TableSharedKeyCredential(
@@ -67,7 +53,7 @@ namespace HelloDallE.Services
                 {
                     TableServiceClient serviceClient = new TableServiceClient(
                         new Uri(azureStorageAccountSettings.storageAccountUri), creds);
-                    
+
                     Pageable<TableItem> tables = serviceClient.Query();
 
                     foreach (var table in tables)
@@ -94,21 +80,21 @@ namespace HelloDallE.Services
                         question.Answers = new List<Answer>();
                         for (int i = 0; i < AnswerTextCollection.Count(); i++)
                         {
-                            question.Answers.Add(new Answer() { 
-                                AnswerText = AnswerTextCollection.ElementAt(i), 
+                            question.Answers.Add(new Answer()
+                            {
+                                AnswerText = AnswerTextCollection.ElementAt(i),
                                 AnswerValue = AnswerValueCollection.ElementAt(i)
                             });
 
                         }
-                        
+
                         Questions.Add(question);
                     }
 
                 }
                 catch (Exception ex)
-                {
+                { 
 
-                    throw;
                 }
             }
         }
