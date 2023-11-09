@@ -4,7 +4,7 @@ param appName string = 'HelloDallE-MTCPhilly'
 param storageAccountName string = 'imagestractrross'
 param vnetName string = 'myvnet'
 param subnetName string = 'mysubnet'
-param privateEndpointName string = 'myprivateendpoint'
+param privateEndpointName string = 'stractprivendpt'
 param tableName string = 'questions'
 
 var subnetStorageName = '${subnetName}-storage'
