@@ -17,7 +17,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' existing = {
 }
 
 // create the resource group for the app service
-resource appServiceResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+resource appServiceResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
   name: 'HelloDallE'
   location: appServiceLocation
 }
