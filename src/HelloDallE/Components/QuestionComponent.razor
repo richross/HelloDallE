@@ -11,7 +11,7 @@
             <div class="row">
                 @foreach (var Answer in Model.Answers)
                 {
-                    <div class="@sectionNumber d-grid">
+                    <div class="col-2 d-grid">
                         <button @onclick="(e => CaptureResponse(e, Answer.AnswerValue))" class="btn-primary btn-outline-success @(Answer.IsActive ? "active" : "")">@Answer.AnswerText</button>
                     </div>
                 }
@@ -23,11 +23,11 @@
 @code {
     [Parameter]
     public QuestionViewModel? Model { get; set; }
-    private string sectionNumber; //used to detemrine the number of sections based on the number of questions
+    // private string sectionNumber; //used to detemrine the number of sections based on the number of questions
 
     protected override void OnInitialized()
     {
-        sectionNumber = "col-" + Convert.ToString(12 / Model.Answers.Count);
+        // sectionNumber = "col-" + Convert.ToString(12 / Model.Answers.Count);
         base.OnInitialized();
     }
 
