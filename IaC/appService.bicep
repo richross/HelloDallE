@@ -2,10 +2,10 @@ param appServicePlanId string
 param location string
 param appName string = 'HelloDallE-MTCPhilly'
 param storageAccountName string = 'imagestractrross'
-param vnetName string = 'myvnet'
-param subnetName string = 'mysubnet'
-param privateEndpointName string = 'stractprivendpt'
-param tableName string = 'questions'
+param vnetName string = 'DallEWorldVnet'
+param subnetName string = 'DallESubnet'
+param privateEndpointName string = 'imagestractrross-pe'
+// param tableName string = 'questions'
 
 var subnetStorageName = '${subnetName}-storage'
 var subnetWebName = '${subnetName}-web'
@@ -31,7 +31,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-02-01' = {
     }
     subnets: [
       {
-        name: '${subnetName}-storage'
+        name: 'subnetStorageName'
         properties: {
           addressPrefix: '10.0.0.0/24'
           serviceEndpoints: [
@@ -45,7 +45,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-02-01' = {
         }
       }
       {
-        name: '${subnetName}-web'
+        name: 'subnetWebName'
         properties: {
           addressPrefix: '10.0.1.0/24'
           serviceEndpoints: [
@@ -79,35 +79,31 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
     name: 'Standard_LRS'
   }
   properties: {
+    accessTier: 'Hot'
+    supportsHttpsTrafficOnly: true
     networkAcls: {
       bypass: 'AzureServices'
-      defaultAction: 'Deny'
+      defaultAction:'Deny'
       virtualNetworkRules: [
         {
           id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, subnetStorageName)
-          action: 'Allow'
+          action:'Allow'
         }
       ]
     }
   }
 }
 
-resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
+module privateEndPointModule 'privateEndpoint.bicep' = {
   name: privateEndpointName
-  location: location
-  properties: {
-    subnet: {
-      id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, subnetStorageName)
-    }
-    privateLinkServiceConnections: [
-      {
-        name: 'plsConnection'
-        properties: {
-          privateLinkServiceId: storageAccount.id
-          groupIds: ['table']
-        }
-      }
-    ]
+  scope: resourceGroup()
+  params: {
+    privateEndpointName: privateEndpointName
+    location: location
+    vnetName: vnetName
+    subnetName: subnetStorageName
+    serviceId: storageAccount.id
+    groupIdArray: ['table']
   }
 }
 
@@ -115,20 +111,6 @@ resource appServiceVnetIntegration 'Microsoft.Web/sites/networkConfig@2022-09-01
   name: 'virtualNetwork'
   parent: appService
   properties: {
-    subnetResourceId: vnet.properties.subnets[1].id
+    subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, subnetWebName)
   }
 }
-
-// resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-05-01' = {
-//   name: '${privateEndpoint.name}/default'
-//   properties: {
-//     privateDnsZoneConfigs: [
-//       {
-//         name: 'config1'
-//         properties: {
-//           privateDnsZoneId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Network/privateDnsZones/blob.core.windows.net'
-//         }
-//       }
-//     ]
-//   }
-// }
