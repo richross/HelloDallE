@@ -11,17 +11,32 @@
 <div class="alert-info">
     Descriptive text that explains to the user how this works.
 </div>
-<div class="container">
-    <div class="row">
+
+@if (Questions != null)
+{
+    <div class="container">
+        <div class="row">
+
+    @if (Questions.Count() > 0)
+    {
         @foreach (var Question in Questions)
         {
             <div class="@questionNumber">
-            <HelloDallE.Components.QuestionComponent Model="@Question">
+                <HelloDallE.Components.QuestionComponent Model="@Question">
             </HelloDallE.Components.QuestionComponent>
             </div>
-        }
+        }                
+    }
+    else
+    {
+        <div class="alert-warning">
+            <strong>Warning!</strong> Could not retrieve questions from the database.
+        </div>
+    }
+
+        </div>
     </div>
-</div>
+}
 <InputTextArea @bind-Value="DallEComms.PromptText" class="col-12" /><button @onclick="SubmitPrompt">Submit</button><br/>
 
 @if (DallEComms.LastContentUrl != null)
@@ -39,8 +54,7 @@
 
     protected override void OnInitialized()
     {
-        // DallEComms.PromptText = "Hello from Blazor";
-
+        DataService.GetQuestions();
         Questions = DataService.Questions;
     }
 

@@ -4,6 +4,7 @@ using HelloDallE.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<IDataService, DataService>();
-builder.Configuration.AddUserSecrets<AzureOpenAISettings>();
+builder.Configuration.AddUserSecrets("8fa5b3fd-bf8d-44e7-a9e4-aaa24e11ebda");
 builder.Services.AddScoped<IDallEComms, DallEComms>();
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["storageAccountConnString:blob"], preferMsi: true);
+    clientBuilder.AddQueueServiceClient(builder.Configuration["storageAccountConnString:queue"], preferMsi: true);
+});
 
 var app = builder.Build();
 
