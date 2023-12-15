@@ -3,7 +3,7 @@
 
 # commands for creating the app reg and service principal for GitHub OID Federation
 
-$appId = az ad app create --display-name "MyApp"
+$appId = az ad app create --display-name "HelloDallE_AppReg"
 
 $objectId = az ad sp create --id $appId
 

@@ -1,0 +1,2838 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworks_myvnet_name": {
+            "defaultValue": "myvnet",
+            "type": "String"
+        },
+        "sites_HelloDallE_MTCPhilly_name": {
+            "defaultValue": "HelloDallE-MTCPhilly",
+            "type": "String"
+        },
+        "privateEndpoints_imagestract_pe_name": {
+            "defaultValue": "imagestract-pe",
+            "type": "String"
+        },
+        "storageAccounts_datastractrrross_name": {
+            "defaultValue": "datastractrrross",
+            "type": "String"
+        },
+        "storageAccounts_imagestractrross_name": {
+            "defaultValue": "imagestractrross",
+            "type": "String"
+        },
+        "configurationStores_dalleconfigurations_name": {
+            "defaultValue": "dalleconfigurations",
+            "type": "String"
+        },
+        "privateDnsZones_privatelink_table_core_windows_net_name": {
+            "defaultValue": "privatelink.table.core.windows.net",
+            "type": "String"
+        },
+        "networkSecurityGroups_myvnet_mysubnet_web_nsg_eastus_name": {
+            "defaultValue": "myvnet-mysubnet-web-nsg-eastus",
+            "type": "String"
+        },
+        "networkSecurityGroups_myvnet_mysubnet_storage_nsg_eastus_name": {
+            "defaultValue": "myvnet-mysubnet-storage-nsg-eastus",
+            "type": "String"
+        },
+        "serverfarms_plan_PromptEngineeringWithDalle_dev_externalid": {
+            "defaultValue": "/subscriptions/7f32b33b-24a6-4833-a6ad-9df3b4adbbe7/resourceGroups/rg-PromptEngineeringWithDalle-dev/providers/Microsoft.Web/serverfarms/plan-PromptEngineeringWithDalle-dev",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.AppConfiguration/configurationStores",
+            "apiVersion": "2023-03-01",
+            "name": "[parameters('configurationStores_dalleconfigurations_name')]",
+            "location": "eastus",
+            "sku": {
+                "name": "standard"
+            },
+            "properties": {
+                "encryption": {},
+                "disableLocalAuth": false,
+                "softDeleteRetentionInDays": 1,
+                "enablePurgeProtection": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2023-05-01",
+            "name": "[parameters('networkSecurityGroups_myvnet_mysubnet_storage_nsg_eastus_name')]",
+            "location": "eastus",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "AllowCorpnet",
+                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups/securityRules', parameters('networkSecurityGroups_myvnet_mysubnet_storage_nsg_eastus_name'), 'AllowCorpnet')]",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "description": "CSS Governance Security Rule.  Allow Corpnet inbound.  https://aka.ms/casg",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "CorpNetPublic",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 2700,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "AllowSAW",
+                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups/securityRules', parameters('networkSecurityGroups_myvnet_mysubnet_storage_nsg_eastus_name'), 'AllowSAW')]",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "description": "CSS Governance Security Rule.  Allow SAW inbound.  https://aka.ms/casg",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "CorpNetSaw",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 2701,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2023-05-01",
+            "name": "[parameters('networkSecurityGroups_myvnet_mysubnet_web_nsg_eastus_name')]",
+            "location": "eastus",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "AllowCorpnet",
+                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups/securityRules', parameters('networkSecurityGroups_myvnet_mysubnet_web_nsg_eastus_name'), 'AllowCorpnet')]",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "description": "CSS Governance Security Rule.  Allow Corpnet inbound.  https://aka.ms/casg",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "CorpNetPublic",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 2700,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "AllowSAW",
+                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups/securityRules', parameters('networkSecurityGroups_myvnet_mysubnet_web_nsg_eastus_name'), 'AllowSAW')]",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "description": "CSS Governance Security Rule.  Allow SAW inbound.  https://aka.ms/casg",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "CorpNetSaw",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 2701,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones",
+            "apiVersion": "2018-09-01",
+            "name": "[parameters('privateDnsZones_privatelink_table_core_windows_net_name')]",
+            "location": "global",
+            "properties": {
+                "maxNumberOfRecordSets": 25000,
+                "maxNumberOfVirtualNetworkLinks": 1000,
+                "maxNumberOfVirtualNetworkLinksWithRegistration": 100,
+                "numberOfRecordSets": 2,
+                "numberOfVirtualNetworkLinks": 1,
+                "numberOfVirtualNetworkLinksWithRegistration": 0,
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2023-01-01",
+            "name": "[parameters('storageAccounts_datastractrrross_name')]",
+            "location": "eastus",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "dnsEndpointType": "Standard",
+                "defaultToOAuthAuthentication": false,
+                "publicNetworkAccess": "Enabled",
+                "allowCrossTenantReplication": false,
+                "minimumTlsVersion": "TLS1_2",
+                "allowBlobPublicAccess": false,
+                "allowSharedKeyAccess": true,
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "requireInfrastructureEncryption": false,
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+            "apiVersion": "2023-05-01",
+            "name": "[concat(parameters('networkSecurityGroups_myvnet_mysubnet_storage_nsg_eastus_name'), '/AllowCorpnet')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_myvnet_mysubnet_storage_nsg_eastus_name'))]"
+            ],
+            "properties": {
+                "description": "CSS Governance Security Rule.  Allow Corpnet inbound.  https://aka.ms/casg",
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "CorpNetPublic",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 2700,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+            "apiVersion": "2023-05-01",
+            "name": "[concat(parameters('networkSecurityGroups_myvnet_mysubnet_web_nsg_eastus_name'), '/AllowCorpnet')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_myvnet_mysubnet_web_nsg_eastus_name'))]"
+            ],
+            "properties": {
+                "description": "CSS Governance Security Rule.  Allow Corpnet inbound.  https://aka.ms/casg",
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "CorpNetPublic",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 2700,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+            "apiVersion": "2023-05-01",
+            "name": "[concat(parameters('networkSecurityGroups_myvnet_mysubnet_storage_nsg_eastus_name'), '/AllowSAW')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_myvnet_mysubnet_storage_nsg_eastus_name'))]"
+            ],
+            "properties": {
+                "description": "CSS Governance Security Rule.  Allow SAW inbound.  https://aka.ms/casg",
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "CorpNetSaw",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 2701,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+            "apiVersion": "2023-05-01",
+            "name": "[concat(parameters('networkSecurityGroups_myvnet_mysubnet_web_nsg_eastus_name'), '/AllowSAW')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_myvnet_mysubnet_web_nsg_eastus_name'))]"
+            ],
+            "properties": {
+                "description": "CSS Governance Security Rule.  Allow SAW inbound.  https://aka.ms/casg",
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "CorpNetSaw",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 2701,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/A",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(parameters('privateDnsZones_privatelink_table_core_windows_net_name'), '/imagestractrross')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZones_privatelink_table_core_windows_net_name'))]"
+            ],
+            "properties": {
+                "metadata": {
+                    "creator": "created by private endpoint imagestract-pe with resource guid bfc0096e-0bd4-4f8f-89e4-a3007557cf79"
+                },
+                "ttl": 10,
+                "aRecords": [
+                    {
+                        "ipv4Address": "10.0.0.4"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/SOA",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(parameters('privateDnsZones_privatelink_table_core_windows_net_name'), '/@')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZones_privatelink_table_core_windows_net_name'))]"
+            ],
+            "properties": {
+                "ttl": 3600,
+                "soaRecord": {
+                    "email": "azureprivatedns-host.microsoft.com",
+                    "expireTime": 2419200,
+                    "host": "azureprivatedns.net",
+                    "minimumTtl": 10,
+                    "refreshTime": 3600,
+                    "retryTime": 300,
+                    "serialNumber": 1
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2023-01-01",
+            "name": "[parameters('storageAccounts_imagestractrross_name')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_myvnet_name'), 'mysubnet-storage')]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "publicNetworkAccess": "Disabled",
+                "routingPreference": {
+                    "routingChoice": "MicrosoftRouting",
+                    "publishMicrosoftEndpoints": false,
+                    "publishInternetEndpoints": false
+                },
+                "minimumTlsVersion": "TLS1_2",
+                "allowBlobPublicAccess": false,
+                "networkAcls": {
+                    "resourceAccessRules": [],
+                    "bypass": "None",
+                    "virtualNetworkRules": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_myvnet_name'), 'mysubnet-storage')]",
+                            "action": "Allow",
+                            "state": "Succeeded"
+                        }
+                    ],
+                    "ipRules": [
+                        {
+                            "value": "64.211.197.134",
+                            "action": "Allow"
+                        },
+                        {
+                            "value": "108.16.254.167",
+                            "action": "Allow"
+                        }
+                    ],
+                    "defaultAction": "Deny"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2023-01-01",
+            "name": "[concat(parameters('storageAccounts_datastractrrross_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_datastractrrross_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "changeFeed": {
+                    "enabled": false
+                },
+                "restorePolicy": {
+                    "enabled": false
+                },
+                "containerDeleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 7
+                },
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "allowPermanentDelete": false,
+                    "enabled": true,
+                    "days": 7
+                },
+                "isVersioningEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2023-01-01",
+            "name": "[concat(parameters('storageAccounts_imagestractrross_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_imagestractrross_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "allowPermanentDelete": false,
+                    "enabled": false
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices",
+            "apiVersion": "2023-01-01",
+            "name": "[concat(parameters('storageAccounts_datastractrrross_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_datastractrrross_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "protocolSettings": {
+                    "smb": {}
+                },
+                "cors": {
+                    "corsRules": []
+                },
+                "shareDeleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 7
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices",
+            "apiVersion": "2023-01-01",
+            "name": "[concat(parameters('storageAccounts_imagestractrross_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_imagestractrross_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "protocolSettings": {
+                    "smb": {}
+                },
+                "cors": {
+                    "corsRules": []
+                },
+                "shareDeleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 7
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/privateEndpointConnections",
+            "apiVersion": "2023-01-01",
+            "name": "[concat(parameters('storageAccounts_imagestractrross_name'), '/', parameters('storageAccounts_imagestractrross_name'), '.f5d71d91-54f0-4ae3-9349-e9172d2a555d')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_imagestractrross_name'))]"
+            ],
+            "properties": {
+                "provisioningState": "Succeeded",
+                "privateEndpoint": {},
+                "privateLinkServiceConnectionState": {
+                    "status": "Approved",
+                    "description": "Auto-Approved",
+                    "actionRequired": "None"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/queueServices",
+            "apiVersion": "2023-01-01",
+            "name": "[concat(parameters('storageAccounts_datastractrrross_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_datastractrrross_name'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/queueServices",
+            "apiVersion": "2023-01-01",
+            "name": "[concat(parameters('storageAccounts_imagestractrross_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_imagestractrross_name'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/tableServices",
+            "apiVersion": "2023-01-01",
+            "name": "[concat(parameters('storageAccounts_datastractrrross_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_datastractrrross_name'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/tableServices",
+            "apiVersion": "2023-01-01",
+            "name": "[concat(parameters('storageAccounts_imagestractrross_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_imagestractrross_name'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2022-09-01",
+            "name": "[parameters('sites_HelloDallE_MTCPhilly_name')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_myvnet_name'), 'mysubnet-web')]"
+            ],
+            "kind": "app",
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "hellodalle-mtcphilly.azurewebsites.net",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "hellodalle-mtcphilly.scm.azurewebsites.net",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[parameters('serverfarms_plan_PromptEngineeringWithDalle_dev_externalid')]",
+                "reserved": false,
+                "isXenon": false,
+                "hyperV": false,
+                "vnetRouteAllEnabled": true,
+                "vnetImagePullEnabled": false,
+                "vnetContentShareEnabled": false,
+                "siteConfig": {
+                    "numberOfWorkers": 1,
+                    "acrUseManagedIdentityCreds": false,
+                    "alwaysOn": false,
+                    "http20Enabled": false,
+                    "functionAppScaleLimit": 0,
+                    "minimumElasticInstanceCount": 0
+                },
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "clientCertMode": "Required",
+                "hostNamesDisabled": false,
+                "customDomainVerificationId": "C837EA0F0F7A3615A193FF1C3C9CC251F74CC8D7289A9889E7E18AE87B503CFA",
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": false,
+                "redundancyMode": "None",
+                "storageAccountRequired": false,
+                "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_myvnet_name'), 'mysubnet-web')]",
+                "keyVaultReferenceIdentity": "SystemAssigned"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/ftp')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ],
+            "properties": {
+                "allow": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/scm')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ],
+            "properties": {
+                "allow": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/web')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ],
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v7.0",
+                "phpVersion": "5.6",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": "VS2019",
+                "httpLoggingEnabled": false,
+                "acrUseManagedIdentityCreds": false,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "$HelloDallE-MTCPhilly",
+                "scmType": "None",
+                "use32BitWorkerProcess": true,
+                "webSocketsEnabled": false,
+                "alwaysOn": false,
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": false
+                    }
+                ],
+                "loadBalancing": "LeastRequests",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "vnetName": "8ab6d37b-6152-43d8-9fdf-d38993732aaf_mysubnet-web",
+                "vnetRouteAllEnabled": true,
+                "vnetPrivatePortsCount": 0,
+                "localMySqlEnabled": false,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 2147483647,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 2147483647,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": false,
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "scmMinTlsVersion": "1.2",
+                "ftpsState": "FtpsOnly",
+                "preWarmedInstanceCount": 0,
+                "elasticWebAppScaleLimit": 0,
+                "functionsRuntimeScaleMonitoringEnabled": false,
+                "minimumElasticInstanceCount": 0,
+                "azureStorageAccounts": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/42b64c48f8844f759d005e2a6124b8d8')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "OneDeploy",
+                "message": "OneDeploy",
+                "start_time": "2023-11-22T23:34:52.8156393Z",
+                "end_time": "2023-11-22T23:35:01.667047Z",
+                "active": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/5b8310e1b4f7474d93680c45974da14f')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "OneDeploy",
+                "message": "OneDeploy",
+                "start_time": "2023-11-23T01:36:55.8114033Z",
+                "end_time": "2023-11-23T01:36:57.7334225Z",
+                "active": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/81568ccc34554568b4fea63c85ac94d6')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "OneDeploy",
+                "message": "OneDeploy",
+                "start_time": "2023-11-24T19:13:47.895719Z",
+                "end_time": "2023-11-24T19:13:55.4240543Z",
+                "active": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/ac5bea16bd284f4988e0da13c387b81e')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "OneDeploy",
+                "message": "OneDeploy",
+                "start_time": "2023-11-23T01:46:17.6153524Z",
+                "end_time": "2023-11-23T01:46:20.0240279Z",
+                "active": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/ca38b473056d49f194e96365331f5ccc')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "OneDeploy",
+                "message": "OneDeploy",
+                "start_time": "2023-11-23T00:03:25.60709Z",
+                "end_time": "2023-11-23T00:03:27.81348Z",
+                "active": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/eb281a7853fa4ad2a90bf443e5ee6495')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "OneDeploy",
+                "message": "OneDeploy",
+                "start_time": "2023-11-23T01:19:30.4045351Z",
+                "end_time": "2023-11-23T01:19:33.4379801Z",
+                "active": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/', parameters('sites_HelloDallE_MTCPhilly_name'), '.azurewebsites.net')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ],
+            "properties": {
+                "siteName": "HelloDallE-MTCPhilly",
+                "hostNameType": "Verified"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-08T17_17_22_4481618')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-09T02_17_24_8435861')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-09T11_17_27_2751487')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-09T17_17_28_8993867')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-09T23_17_30_4671934')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-10T11_17_33_7022742')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-10T17_17_35_2562940')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-10T23_17_36_8776722')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-11T11_17_40_8838066')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-11T17_17_42_4757614')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-12T02_17_44_8741667')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-12T09_17_46_7425014')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-12T15_17_48_4032988')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-13T02_17_51_2946512')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-13T09_17_53_1427888')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-13T15_17_54_7496129')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-14T02_17_57_6584367')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-14T08_17_59_2635357')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-14T14_18_00_8300586')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-14T20_18_02_4280956')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-15T02_18_04_0298589')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-15T14_18_07_2181542')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-15T20_18_08_8266716')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-16T02_18_10_4190450')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-16T14_18_13_6402996')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-16T20_18_15_2337889')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-17T02_18_16_8549405')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-17T11_18_19_2309456')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-17T20_18_21_6174493')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-18T02_18_23_2302067')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-18T11_18_25_6098506')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-18T20_18_27_9797039')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-19T02_18_29_5841914')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-19T14_18_32_7625115')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-19T20_18_34_3609704')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-20T02_18_35_9814539')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-20T09_18_37_8640728')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-20T12_18_38_6765906')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-20T15_18_39_4919961')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-20T20_18_40_8231113')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-20T23_18_41_6128902')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-21T02_18_42_4016975')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-21T09_18_44_2559432')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-21T12_18_45_0613003')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-21T15_18_45_8826955')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-21T20_18_47_2156444')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-21T23_18_48_0343069')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-22T02_18_48_8333003')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-22T08_18_50_4476610')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-22T11_18_51_2969355')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-22T14_18_52_0890690')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-22T17_18_52_8896705')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-22T20_18_53_7027109')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-22T23_18_54_4831582')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-23T02_18_55_2739810')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-23T09_18_57_1479506')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-23T12_18_57_9344983')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-23T15_18_58_7476790')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-23T18_18_59_5599226')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-23T23_19_00_8702407')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-24T02_19_01_6679458')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-24T07_19_03_0095881')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-24T10_19_03_8199857')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-24T13_19_04_6031439')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-24T16_19_05_4013537')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-24T19_19_06_2057997')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-24T22_19_06_9912153')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-25T01_19_07_8050373')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-25T04_19_08_6261710')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-25T07_19_09_4159433')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-25T13_19_11_0199772')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-25T16_19_11_8109389')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-25T19_19_12_6215175')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-25T22_19_13_4120846')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-26T01_19_14_2041504')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-26T04_19_14_9882604')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-26T07_19_15_7944620')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-26T13_19_17_4227758')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-26T16_19_18_1840348')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-26T19_19_18_9993564')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-26T22_19_19_7902924')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-27T01_19_20_6009158')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-27T04_19_21_3988047')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-27T07_19_22_2220007')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-27T13_19_23_8237536')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-27T16_19_24_6481731')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-27T19_19_25_4580769')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-27T22_19_26_2237425')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-28T01_19_27_0269848')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-28T04_19_27_8218734')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-28T06_40_12_1590903')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-28T13_43_18_2778309')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-28T16_43_18_4045925')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-28T21_43_18_5590564')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-29T00_43_18_6658546')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-29T03_43_18_7878372')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-29T06_43_18_8867025')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-29T13_43_19_1242455')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-29T16_43_19_2519663')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-29T19_43_19_3658684')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-29T22_43_19_4634373')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T03_43_19_6717671')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T06_43_19_7231365')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T11_43_19_8896604')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T12_43_19_8851320')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T13_43_19_9257283')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T14_43_19_9613719')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T15_43_20_0443746')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T16_43_20_0677449')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T17_43_20_0941277')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T18_43_20_1184005')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T19_43_20_1893317')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T20_43_20_1814946')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T21_43_20_2364444')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T22_43_20_2567078')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-11-30T23_43_20_2673359')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T00_43_20_3066727')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T01_43_20_3564437')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T02_43_20_3781797')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T03_43_20_3997953')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T04_43_20_5112084')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T05_43_20_4817284')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T06_43_20_5211502')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T07_43_20_5534069')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T08_43_20_6061998')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T09_43_20_6147893')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T10_43_20_6653462')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T11_43_20_6779003')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T12_43_20_7518834')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T13_43_20_8164071')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T14_43_20_7820747')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T15_43_20_8266044')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T16_43_20_8800833')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T17_43_20_8878622')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T18_43_20_9225207')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T19_43_20_9454210')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T20_43_21_0237991')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T21_43_21_0279861')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T22_43_21_0703153')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-01T23_43_21_0883220')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T00_43_21_1685805')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T01_43_21_1738579')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T02_43_21_2132148')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T03_43_21_2235766')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T04_43_21_2854246')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T05_43_21_2785464')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T06_43_21_3298315')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T07_43_21_3810298')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T08_43_21_4049531')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T09_43_21_4632548')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T10_43_21_4702200')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T11_43_21_4707240')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T12_43_21_5158503')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T13_43_21_6202846')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T14_43_21_5815534')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T15_43_21_6139825')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T16_43_21_6949408')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T17_43_21_7160367')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T18_43_21_7172799')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T19_43_21_7393606')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T20_43_21_7797829')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T21_43_21_8550041')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T22_43_21_8522735')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-02T23_43_21_9007170')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T00_43_21_9046266')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T01_43_21_9611304')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T02_43_21_9689612')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T03_43_21_9993980')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T04_43_22_0525672')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T05_43_22_0788690')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T06_43_22_0900481')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T07_43_22_1163172')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T08_43_22_1492720')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T09_43_22_5950277')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T10_43_22_6330428')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T11_43_22_6480647')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T12_43_22_6671786')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T13_43_22_7352683')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T14_43_22_7310147')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T15_43_22_8018883')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T16_43_22_8299594')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T17_43_22_8681390')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T18_43_22_9025404')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T19_43_22_9245622')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T20_43_22_9666887')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T21_43_23_0416800')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T22_43_23_0582172')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-03T23_43_23_0585409')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T00_43_23_1328635')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T01_43_23_1878573')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T02_43_23_1839294')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T03_43_23_2159519')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T04_43_23_2767068')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T05_43_23_2971844')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T06_43_23_3078779')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T07_43_23_3349664')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T08_43_23_3883320')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T09_43_23_4406381')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T10_43_23_4949419')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T11_43_23_4861906')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T12_43_23_5044694')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T13_43_23_5727021')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T14_43_23_5806826')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T15_43_23_6390942')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T16_43_23_6890861')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T17_43_23_7245068')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T18_43_23_7475090')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T19_43_23_7796268')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T20_43_23_8159736')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T21_43_23_9061876')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T22_43_23_9308941')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-04T23_43_23_9493516')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/snapshots",
+            "apiVersion": "2015-08-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/2023-12-05T00_43_23_9809856')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(parameters('privateDnsZones_privatelink_table_core_windows_net_name'), '/ozulcsjk7bws2')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZones_privatelink_table_core_windows_net_name'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_myvnet_name'))]"
+            ],
+            "properties": {
+                "registrationEnabled": false,
+                "virtualNetwork": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_myvnet_name'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints",
+            "apiVersion": "2023-05-01",
+            "name": "[parameters('privateEndpoints_imagestract_pe_name')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_imagestractrross_name'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_myvnet_name'), 'mysubnet-storage')]"
+            ],
+            "properties": {
+                "privateLinkServiceConnections": [
+                    {
+                        "name": "[parameters('privateEndpoints_imagestract_pe_name')]",
+                        "id": "[concat(resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpoints_imagestract_pe_name')), concat('/privateLinkServiceConnections/', parameters('privateEndpoints_imagestract_pe_name')))]",
+                        "properties": {
+                            "privateLinkServiceId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_imagestractrross_name'))]",
+                            "groupIds": [
+                                "table"
+                            ],
+                            "privateLinkServiceConnectionState": {
+                                "status": "Approved",
+                                "description": "Auto-Approved",
+                                "actionsRequired": "None"
+                            }
+                        }
+                    }
+                ],
+                "manualPrivateLinkServiceConnections": [],
+                "customNetworkInterfaceName": "[concat(parameters('privateEndpoints_imagestract_pe_name'), '-nic')]",
+                "subnet": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_myvnet_name'), 'mysubnet-storage')]"
+                },
+                "ipConfigurations": [],
+                "customDnsConfigs": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+            "apiVersion": "2023-05-01",
+            "name": "[concat(parameters('privateEndpoints_imagestract_pe_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpoints_imagestract_pe_name'))]",
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZones_privatelink_table_core_windows_net_name'))]"
+            ],
+            "properties": {
+                "privateDnsZoneConfigs": [
+                    {
+                        "name": "privatelink-table-core-windows-net",
+                        "properties": {
+                            "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZones_privatelink_table_core_windows_net_name'))]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2023-05-01",
+            "name": "[parameters('virtualNetworks_myvnet_name')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_myvnet_mysubnet_storage_nsg_eastus_name'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_myvnet_mysubnet_web_nsg_eastus_name'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.0.0.0/16"
+                    ]
+                },
+                "dhcpOptions": {
+                    "dnsServers": []
+                },
+                "subnets": [
+                    {
+                        "name": "mysubnet-storage",
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_myvnet_name'), 'mysubnet-storage')]",
+                        "properties": {
+                            "addressPrefix": "10.0.0.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_myvnet_mysubnet_storage_nsg_eastus_name'))]"
+                            },
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.Storage",
+                                    "locations": [
+                                        "eastus",
+                                        "westus",
+                                        "westus3"
+                                    ]
+                                }
+                            ],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        },
+                        "type": "Microsoft.Network/virtualNetworks/subnets"
+                    },
+                    {
+                        "name": "mysubnet-web",
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_myvnet_name'), 'mysubnet-web')]",
+                        "properties": {
+                            "addressPrefix": "10.0.1.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_myvnet_mysubnet_web_nsg_eastus_name'))]"
+                            },
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.Web",
+                                    "locations": [
+                                        "*"
+                                    ]
+                                }
+                            ],
+                            "delegations": [
+                                {
+                                    "name": "Microsoft.Web.serverFarms",
+                                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_myvnet_name'), 'mysubnet-web'), '/delegations/Microsoft.Web.serverFarms')]",
+                                    "properties": {
+                                        "serviceName": "Microsoft.Web/serverFarms"
+                                    },
+                                    "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+                                }
+                            ],
+                            "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        },
+                        "type": "Microsoft.Network/virtualNetworks/subnets"
+                    }
+                ],
+                "virtualNetworkPeerings": [],
+                "enableDdosProtection": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2023-05-01",
+            "name": "[concat(parameters('virtualNetworks_myvnet_name'), '/mysubnet-storage')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_myvnet_name'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_myvnet_mysubnet_storage_nsg_eastus_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "10.0.0.0/24",
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_myvnet_mysubnet_storage_nsg_eastus_name'))]"
+                },
+                "serviceEndpoints": [
+                    {
+                        "service": "Microsoft.Storage",
+                        "locations": [
+                            "eastus",
+                            "westus",
+                            "westus3"
+                        ]
+                    }
+                ],
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2023-05-01",
+            "name": "[concat(parameters('virtualNetworks_myvnet_name'), '/mysubnet-web')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_myvnet_name'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_myvnet_mysubnet_web_nsg_eastus_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "10.0.1.0/24",
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_myvnet_mysubnet_web_nsg_eastus_name'))]"
+                },
+                "serviceEndpoints": [
+                    {
+                        "service": "Microsoft.Web",
+                        "locations": [
+                            "*"
+                        ]
+                    }
+                ],
+                "delegations": [
+                    {
+                        "name": "Microsoft.Web.serverFarms",
+                        "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_myvnet_name'), 'mysubnet-web'), '/delegations/Microsoft.Web.serverFarms')]",
+                        "properties": {
+                            "serviceName": "Microsoft.Web/serverFarms"
+                        },
+                        "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+                    }
+                ],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2023-01-01",
+            "name": "[concat(parameters('storageAccounts_imagestractrross_name'), '/default/test')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_imagestractrross_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_imagestractrross_name'))]"
+            ],
+            "properties": {
+                "immutableStorageWithVersioning": {
+                    "enabled": false
+                },
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/tableServices/tables",
+            "apiVersion": "2023-01-01",
+            "name": "[concat(parameters('storageAccounts_datastractrrross_name'), '/default/questions')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/tableServices', parameters('storageAccounts_datastractrrross_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_datastractrrross_name'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/tableServices/tables",
+            "apiVersion": "2023-01-01",
+            "name": "[concat(parameters('storageAccounts_imagestractrross_name'), '/default/questions')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/tableServices', parameters('storageAccounts_imagestractrross_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_imagestractrross_name'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Web/sites/virtualNetworkConnections",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('sites_HelloDallE_MTCPhilly_name'), '/8ab6d37b-6152-43d8-9fdf-d38993732aaf_mysubnet-web')]",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_HelloDallE_MTCPhilly_name'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_myvnet_name'), 'mysubnet-web')]"
+            ],
+            "properties": {
+                "vnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_myvnet_name'), 'mysubnet-web')]",
+                "isSwift": true
+            }
+        }
+    ]
+}
