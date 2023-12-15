@@ -30,7 +30,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
 
 //create a private DNS zone for the provided resource
 resource privateDNSZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: '${privateEndpointName}-dnszone'
+  name: 'privatelink.table.core.windows.net'
   location: 'global'
   dependsOn: [
     privateEndpoint
@@ -40,9 +40,7 @@ resource privateDNSZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
 //create the private DNS zone group for the provided resource
 resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-05-01' = {
   name: '${privateEndpointName}-dnszonegroup'
-  dependsOn: [
-    privateEndpoint
-  ]
+  parent: privateEndpoint
   properties: {
     privateDnsZoneConfigs: [
       {

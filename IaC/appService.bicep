@@ -1,7 +1,6 @@
-param appServicePlanId string
-param location string
-param appName string = 'HelloDallE-MTCPhilly'
-param storageAccountName string = 'imagestractrross'
+param location string = resourceGroup().location
+param appName string = 'HelloDallE-Philly'
+param storageAccountName string = 'hellodallephilly'
 param vnetName string = 'DallEWorldVnet'
 param subnetName string = 'DallESubnet'
 param privateEndpointName string = 'imagestractrross-pe'
@@ -10,12 +9,27 @@ param privateEndpointName string = 'imagestractrross-pe'
 var subnetStorageName = '${subnetName}-storage'
 var subnetWebName = '${subnetName}-web'
 
+// create an app service plan for the applications
+resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
+  name: 'MTCApplications'
+  location: location
+  sku: {
+    name: 'S1'
+    tier: 'Standard'
+  }
+  kind: 'linux'
+}
+
 resource appService 'Microsoft.Web/sites@2022-09-01' = {
   name: appName
   location: location
   kind: 'app'
   properties: {
-    serverFarmId: appServicePlanId
+    serverFarmId: appServicePlan.id
+    siteConfig : {
+      netFrameworkVersion: 'v7.0'
+      vnetRouteAllEnabled: true
+    }
   }
 }
 
@@ -31,7 +45,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-02-01' = {
     }
     subnets: [
       {
-        name: 'subnetStorageName'
+        name: subnetStorageName
         properties: {
           addressPrefix: '10.0.0.0/24'
           serviceEndpoints: [
@@ -45,7 +59,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-02-01' = {
         }
       }
       {
-        name: 'subnetWebName'
+        name: subnetWebName
         properties: {
           addressPrefix: '10.0.1.0/24'
           serviceEndpoints: [
@@ -91,8 +105,10 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
         }
       ]
     }
+    publicNetworkAccess: 'Disabled'
   }
 }
+
 
 module privateEndPointModule 'privateEndpoint.bicep' = {
   name: privateEndpointName
