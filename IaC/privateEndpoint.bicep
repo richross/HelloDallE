@@ -1,6 +1,7 @@
 param privateEndpointName string
 param location string
 param vnetName string
+param vnetId string
 param subnetName string
 param serviceId string
 param groupIdArray string[]
@@ -50,5 +51,18 @@ resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
         }
       }
     ]
+  }
+}
+
+//this was done manually in the portal, but the code was pulled from the 428828 installation 
+resource privateDnsZones_virtualNetworkLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2018-09-01' = {
+  parent: privateDNSZone
+  name: 'foeiwjfoeqf'
+  location: 'global'
+  properties: {
+    registrationEnabled: false
+    virtualNetwork: {
+      id: vnetId
+    }
   }
 }

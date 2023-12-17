@@ -117,6 +117,7 @@ module privateEndPointModule 'privateEndpoint.bicep' = {
     privateEndpointName: privateEndpointName
     location: location
     vnetName: vnetName
+    vnetId: vnet.id
     subnetName: subnetStorageName
     serviceId: storageAccount.id
     groupIdArray: ['table']
