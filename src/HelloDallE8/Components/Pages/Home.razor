@@ -1,0 +1,68 @@
+﻿@page "/"
+@using HelloDallE8.Models;
+@using HelloDallE8.Services;
+@using HelloDallE8.Components;
+
+@inject IDallEComms DallEComms
+@inject IDataService DataService
+
+<PageTitle>Questions</PageTitle>
+
+<h1>DallE Image Generator Sample</h1>
+<div class="alert-info">
+    Descriptive text that explains to the user how this works.
+</div>
+<div class="container">
+    <div class="row">
+        @foreach (var Question in Questions)
+        {
+            <div class="@questionNumber">
+            <QuestionsComponent Model="@Question">
+            </QuestionsComponent>
+            </div>
+        }
+    </div>
+</div>
+<InputTextArea @bind-Value="DallEComms.PromptText" class="col-12" /><button @onclick="SubmitPrompt">Submit</button><br/>
+
+@if (DallEComms.LastContentUrl != null)
+{
+    <div id="ImagePromptText">@ImagePromptText</div>
+    <div>
+        <img src="@DallEComms.LastContentUrl" />
+    </div>
+}
+
+@code{
+    private List<QuestionViewModel> Questions;
+    private string ImagePromptText = "";
+    private string questionNumber = "col-6";
+
+    protected override void OnInitialized()
+    {
+        // DallEComms.PromptText = "Hello from Blazor";
+
+        Questions = DataService.Questions;
+    }
+
+    private async Task SubmitPrompt()
+    {
+        //go get my image!
+        await DallEComms.RequestImage();
+
+        //save the prompt text for display.
+        ImagePromptText = DallEComms.PromptText;
+
+        //clear the text box of the prompt.
+        DallEComms.PromptText = string.Empty;
+
+        // clear QuestionComponent formatting on buttons
+        foreach (var question in Questions)
+        {
+            foreach (var answer in question.Answers)
+            {
+                answer.IsActive = false;
+            }
+        }
+    }
+}
