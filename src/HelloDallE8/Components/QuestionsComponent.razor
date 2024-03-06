@@ -1,5 +1,8 @@
 ﻿@using HelloDallE8.Models;
+@using HelloDallE8.Services;
+
 @inject IDallEComms DallEComms;
+@inject ResponseState questionState;
 
 @rendermode InteractiveServer
 
@@ -35,21 +38,18 @@
 
     private void CaptureResponse(MouseEventArgs e, string value)
     {
-        //save the answer to state.
-        DallEComms.PromptText += value;
-
         //set the button to active and confirm other buttons are not active.
         foreach (var answer in Model.Answers)
         {
             if (answer.AnswerValue == value)
             {
                 answer.IsActive = true;
+                questionState.AddOrUpdateResponse(Model.QuestionName, value);
             }
             else
             {
                 answer.IsActive = false;
             }
         }
-
     }
 }

@@ -5,6 +5,9 @@
 
 @inject IDallEComms DallEComms
 @inject IDataService DataService
+@inject ResponseState questionState
+
+@rendermode InteractiveServer
 
 <PageTitle>Questions</PageTitle>
 
@@ -34,19 +37,29 @@
 }
 
 @code{
+    public Dictionary<string, string> Responses = new Dictionary<string, string>();
+
     private List<QuestionViewModel> Questions;
     private string ImagePromptText = "";
     private string questionNumber = "col-6";
 
     protected override void OnInitialized()
     {
-        // DallEComms.PromptText = "Hello from Blazor";
-
         Questions = DataService.Questions;
+
+        questionState.OnResponseChanged += StateHasChanged;
+    }
+
+    //method to handle the state change of the response
+    private void StateHasChanged()
+    {
+        Responses = questionState.Responses;
     }
 
     private async Task SubmitPrompt()
     {
+        var dump = Responses;
+
         //go get my image!
         await DallEComms.RequestImage();
 

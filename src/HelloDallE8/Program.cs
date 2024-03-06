@@ -14,6 +14,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<IDataService, DataService>();
 builder.Configuration.AddUserSecrets<AzureOpenAISettings>();
 builder.Services.AddScoped<IDallEComms, DallEComms>();
+builder.Services.AddScoped<ResponseState>();
 
 var app = builder.Build();
 
