@@ -47,18 +47,21 @@
     {
         Questions = DataService.Questions;
 
-        questionState.OnResponseChanged += StateHasChanged;
+        questionState.OnResponseChanged += ResponseStateHasChanged;
     }
 
     //method to handle the state change of the response
-    private void StateHasChanged()
+    private void ResponseStateHasChanged()
     {
         Responses = questionState.Responses;
     }
 
     private async Task SubmitPrompt()
     {
-        var dump = Responses;
+        var dump = String.Join(",", Responses.Values);
+
+        //take the array of responses and generate a prompt
+
 
         //go get my image!
         await DallEComms.RequestImage();
