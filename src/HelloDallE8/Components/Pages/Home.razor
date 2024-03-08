@@ -6,6 +6,7 @@
 @inject IDallEComms DallEComms
 @inject IDataService DataService
 @inject ResponseState questionState
+@inject IAzureOpenAISettings aoaiSettings
 
 @rendermode InteractiveServer
 
@@ -58,10 +59,14 @@
 
     private async Task SubmitPrompt()
     {
-        var dump = String.Join(",", Responses.Values);
+        var responseValuesCsv = String.Join(",", Responses.Values);
 
         //take the array of responses and generate a prompt
 
+        var kernel = new SemanticKernelTextCompletionService(aoaiSettings);
+
+        kernel.SK_PromptCreation(responseValuesCsv);
+        var PromptForImage = await kernel.InvokePromptAsync();
 
         //go get my image!
         await DallEComms.RequestImage();

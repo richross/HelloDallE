@@ -11,10 +11,17 @@ builder.Services.AddRazorComponents()
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<IDataService, DataService>();
+
+//configuration settings
 builder.Configuration.AddUserSecrets<AzureOpenAISettings>();
+
+//AzureOpenAISettings
+builder.Services.AddSingleton<IAzureOpenAISettings>(new AzureOpenAISettings(builder.Configuration));
+
+builder.Services.AddSingleton<IDataService, DataService>();
 builder.Services.AddScoped<IDallEComms, DallEComms>();
 builder.Services.AddScoped<ResponseState>();
+builder.Services.AddTransient<SemanticKernelTextCompletionService>();
 
 var app = builder.Build();
 
