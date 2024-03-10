@@ -12,21 +12,24 @@
 
 <PageTitle>Questions</PageTitle>
 
-<h1>DallE Image Generator Sample</h1>
-<div class="alert-info">
-    Descriptive text that explains to the user how this works.
-</div>
-<div class="container">
-    <div class="row">
-        @foreach (var Question in Questions)
-        {
-            <div class="@questionNumber">
-            <QuestionsComponent Model="@Question">
-            </QuestionsComponent>
-            </div>
-        }
-    </div>
-</div>
+<FluentMainLayout>
+
+    <Header>
+        <h3>Questions</h3>
+    </Header>
+
+    <Body>
+        <FluentStack Orientation="Orientation.Vertical"> 
+            @foreach (var Question in Questions)
+            {
+                <QuestionsComponent Model="@Question">
+                </QuestionsComponent>
+            }            
+        </FluentStack>
+    </Body>        
+        
+</FluentMainLayout>
+
 <InputTextArea @bind-Value="DallEComms.PromptText" class="col-12" /><button @onclick="SubmitPrompt">Submit</button><br/>
 
 @if (DallEComms.LastContentUrl != null)

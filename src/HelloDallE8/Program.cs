@@ -1,6 +1,7 @@
 using HelloDallE8.Components;
 using HelloDallE8.Models;
 using HelloDallE8.Services;
+using Microsoft.FluentUI.AspNetCore.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,13 @@ builder.Services.AddSingleton<IDataService, DataService>();
 builder.Services.AddScoped<IDallEComms, DallEComms>();
 builder.Services.AddScoped<ResponseState>();
 builder.Services.AddTransient<SemanticKernelTextCompletionService>();
+
+//needed for the FluentUI components
+
+// this service might be needed for fluentUI components.
+// leaving it here for now but just commenting it out.
+//builder.Services.AddHttpClient();
+builder.Services.AddFluentUIComponents();
 
 var app = builder.Build();
 

@@ -6,24 +6,20 @@
 
 @rendermode InteractiveServer
 
-<div class="border border-primary text-center">
-    <div class="bg-light">
-        <h3>@Model.QuestionName</h3>
-    </div>
-    <div class="border border-2 rounded-3 border-black">
-        <div class="text-center gap-lg-5">@Model.QuestionText</div>
-        <div class="container">
-            <div class="row">
-                @foreach (var Answer in Model.Answers)
-                {
-                    <div class="@sectionNumber d-grid">
-                        <button @onclick="(e => CaptureResponse(e, Answer.AnswerValue))" class="btn-primary btn-outline-success @(Answer.IsActive ? "active" : "")">@Answer.AnswerText</button>
-                    </div>
-                }
-            </div>
+<FluentCard>
+    @* <div class="border border-primary text-center"> *@
+        <div class="bg-light">
+            <h3>@Model.QuestionName</h3>
         </div>
-    </div>
-</div>
+                    @foreach (var Answer in Model.Answers)
+                    {
+                            <FluentButton Appearance="@Appearance.Accent" @onclick="(e => CaptureResponse(e, Answer.AnswerValue))">@Answer.AnswerText</FluentButton>
+                    }
+@*                 </div>
+            </div>
+        </div> *@
+    @* </div> *@
+</FluentCard>
 
 @code {
     [Parameter]
