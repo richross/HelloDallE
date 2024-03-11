@@ -6,19 +6,27 @@
 
 @rendermode InteractiveServer
 
-<FluentCard>
-    @* <div class="border border-primary text-center"> *@
-        <div class="bg-light">
-            <h3>@Model.QuestionName</h3>
-        </div>
-                    @foreach (var Answer in Model.Answers)
-                    {
-                            <FluentButton Appearance="@Appearance.Accent" @onclick="(e => CaptureResponse(e, Answer.AnswerValue))">@Answer.AnswerText</FluentButton>
-                    }
-@*                 </div>
-            </div>
-        </div> *@
-    @* </div> *@
+<FluentCard MinimalStyle=true>
+        <FluentGrid Spacing="1">
+            <FluentGridItem lg="3">
+                <h3>@Model.QuestionName</h3>
+            </FluentGridItem>
+            <FluentGridItem lg="3">
+                <p>@Model.QuestionText</p>
+            </FluentGridItem>
+            <FluentGridItem lg="6">
+                @foreach (var Answer in Model.Answers)
+                {
+                    //button appearance is determined by the IsActive property
+                    Appearance buttonAppearance = Answer.IsActive ? Appearance.Accent : Appearance.Neutral;
+
+                        <FluentButton Appearance="@buttonAppearance" 
+                        @onclick="(e => CaptureResponse(e, Answer.AnswerValue))">
+                            @Answer.AnswerText
+                        </FluentButton>
+                }
+            </FluentGridItem>
+        </FluentGrid>
 </FluentCard>
 
 @code {

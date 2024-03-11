@@ -10,28 +10,40 @@
 
 @rendermode InteractiveServer
 
-<PageTitle>Questions</PageTitle>
+<PageTitle>Hello DallE</PageTitle>
 
-<FluentMainLayout>
+<FluentMainLayout NavMenuTitle="Navigation">
 
     <Header>
-        <h3>Questions</h3>
+        <h1>Hello DallE Experience</h1>
     </Header>
 
+    <NavMenuContent>
+        <FluentNavLink Href="/" Icon="@(new Icons.Regular.Size24.Home())">Home</FluentNavLink>
+        <FluentNavLink Href="/Questions" Icon="@(new Icons.Regular.Size24.ChatBubblesQuestion())">Questions</FluentNavLink>
+        <FluentNavLink Href="/Design" Icon="@(new Icons.Regular.Size24.DesignIdeas())">Design</FluentNavLink>
+        <FluentNavLink Href="/About" Icon="@(new Icons.Regular.Size24.Archive())">About</FluentNavLink>
+    </NavMenuContent>
+
     <Body>
-        <FluentStack Orientation="Orientation.Vertical"> 
-            @foreach (var Question in Questions)
-            {
-                <QuestionsComponent Model="@Question">
-                </QuestionsComponent>
-            }            
-        </FluentStack>
+        <div style="margin: 10px">
+            <FluentStack Orientation="Orientation.Vertical"> 
+                @foreach (var Question in Questions)
+                {
+                    <QuestionsComponent Model="@Question">
+                    </QuestionsComponent>
+                }            
+            </FluentStack>
+        </div>
     </Body>        
         
 </FluentMainLayout>
 
+@* TODO: move this to its own control. *@
 <InputTextArea @bind-Value="DallEComms.PromptText" class="col-12" /><button @onclick="SubmitPrompt">Submit</button><br/>
 
+
+@* TODO: move this to its own control. *@
 @if (DallEComms.LastContentUrl != null)
 {
     <div id="ImagePromptText">@ImagePromptText</div>
@@ -45,7 +57,6 @@
 
     private List<QuestionViewModel> Questions;
     private string ImagePromptText = "";
-    private string questionNumber = "col-6";
 
     protected override void OnInitialized()
     {
