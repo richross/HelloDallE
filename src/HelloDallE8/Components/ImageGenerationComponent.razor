@@ -1,0 +1,42 @@
+﻿@using HelloDallE8.Models;
+@using HelloDallE8.Services;
+
+@inject IAzureOpenAISettings aoaiSettings;
+@inject ResponseState questionState;
+
+@rendermode InteractiveServer
+
+<FluentTextArea @bind-Value="PromptForImage" Label="Prompt generated from your answers:" Rows="4" Style="width: 500px"/>
+<FluentButton Appearance="Appearance.Lightweight" @onclick="SubmitPrompt">Submit</FluentButton>
+<br />
+<FluentCard>
+    <FluentProgressRing Visible="@LoadingImage" />
+    <img src="@ImageUrlFromDallE" />
+</FluentCard>
+
+@code {    
+
+    private bool LoadingImage = false;
+    private string PromptForImage = string.Empty; 
+    private string ImageUrlFromDallE = string.Empty;
+    private async Task SubmitPrompt()
+    {
+        LoadingImage = true;
+
+        var responseValuesCsv = String.Join(",", questionState.Responses.Values);
+
+        //take the array of responses and generate a prompt
+
+        var kernel = new SemanticKernelTextCompletionService(aoaiSettings);
+
+        kernel.SK_PromptCreation(responseValuesCsv);
+        PromptForImage = await kernel.InvokePromptAsync();
+
+        //go get my image!
+        var imageKernel = new SemanticKernelTextToImageService(aoaiSettings);
+        imageKernel.SK_PromptCreation(PromptForImage);
+        ImageUrlFromDallE = await imageKernel.InvokePromptAsync();
+
+        LoadingImage = false;
+    }
+}

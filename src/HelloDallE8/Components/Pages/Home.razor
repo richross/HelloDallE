@@ -1,0 +1,111 @@
+﻿@page "/"
+@attribute [StreamRendering(true)]
+
+@using HelloDallE8.Models;
+@using HelloDallE8.Services;
+@using HelloDallE8.Components;
+@using System.Text.Json;
+
+@inject IDallEComms DallEComms
+@inject IDataService DataService
+@inject ResponseState questionState
+@inject IAzureOpenAISettings aoaiSettings
+
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<PageTitle>Hello DallE</PageTitle>
+
+<FluentMainLayout NavMenuTitle="Navigation">
+
+    <Header>
+        <h1>Hello DallE Experience</h1>
+    </Header>
+
+    <NavMenuContent>
+        <FluentNavLink Href="/" Icon="@(new Icons.Regular.Size24.Home())">Home</FluentNavLink>
+        <FluentNavLink Href="/Questions" Icon="@(new Icons.Regular.Size24.ChatBubblesQuestion())">Questions</FluentNavLink>
+        <FluentNavLink Href="/Design" Icon="@(new Icons.Regular.Size24.DesignIdeas())">Design</FluentNavLink>
+        <FluentNavLink Href="/About" Icon="@(new Icons.Regular.Size24.Archive())">About</FluentNavLink>
+    </NavMenuContent>
+
+    <Body>
+        <div style="width:auto">
+            <div style="margin: 10px; width: 500px">
+                @if (Questions.Any())
+                {                    
+                    <FluentStack Orientation="Orientation.Vertical"> 
+                        @foreach (var Question in Questions)
+                        {
+                            <QuestionsComponent Model="@Question">
+                            </QuestionsComponent>
+                        }            
+                    </FluentStack>
+                }
+                else
+                {
+                    <p>Loading the questions</p>
+                    <FluentProgressRing Visible=true></FluentProgressRing>
+                }
+            </div>
+            <div style="margin: 10px; width: 400 px">
+                <ImageGenerationComponent></ImageGenerationComponent>
+            </div>
+        </div>
+    </Body>        
+        
+</FluentMainLayout>
+
+@code{
+    public Dictionary<string, string> Responses = new Dictionary<string, string>();
+
+    private List<QuestionViewModel> Questions;
+    private string ImagePromptText = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Questions == null)
+        {
+            Questions = new List<QuestionViewModel>();
+            await LoadQuestions();
+        }
+
+        questionState.OnResponseChanged += ResponseStateHasChanged;
+    }
+
+    private async Task LoadQuestions()
+    {
+        var SKQuestions = new SemanticKernelGenerateQuestionsService(aoaiSettings);
+
+        SKQuestions.SK_PromptCreation();
+        string questString = string.Empty;
+
+        try
+        {
+            Task.Run(async () =>
+            {
+                questString = await SKQuestions.InvokePromptAsync();
+
+            }).Wait();
+
+            questString = await SKQuestions.InvokePromptAsync();
+
+            Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questString);
+        }
+        catch (JsonException jsonEx)
+        {
+            questString = await SKQuestions.InvokePromptAsync();   
+        }
+        catch (Exception ex)
+        {
+            
+            throw;
+        }
+ 
+    }
+
+    //method to handle the state change of the response
+    private void ResponseStateHasChanged()
+    {
+        Responses = questionState.Responses;
+    }
+}

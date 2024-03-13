@@ -1,0 +1,16 @@
+﻿Generate a collection of questions and answers that will be used to describe an image the user wants to create with the DallE service. The collection should contain at least 5 questions. Each question should have 4-5 choices and each choice is 1 or 2 words. 
+Responses will be in the following JSON format:
+
+{
+  "Category": "Color",
+  "Question": "What is your favorite color?",
+  "Answers": {"Red","Blue","Green","Yellow","Azure"}
+}
+
+Examples:
+[
+{ "Category": "Color", "Question": "What is your favorite color?", "Answers": {"Red","Blue","Green","Yellow","Azure"} },
+{ "Category": "Seasons", "Question": "What type of season do you like?", "Answers": {"Summer","Winter","Spring","Fall"} }
+]
+
+Questions:

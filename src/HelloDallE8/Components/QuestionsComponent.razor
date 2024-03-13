@@ -1,0 +1,57 @@
+﻿@using HelloDallE8.Models;
+@using HelloDallE8.Services;
+
+@inject IDallEComms DallEComms;
+@inject ResponseState questionState;
+
+@rendermode InteractiveServer
+
+<FluentCard MinimalStyle=true>
+        <FluentGrid Spacing="1">
+            <FluentGridItem lg="2">
+                <h3>@Model.QuestionCategory</h3>
+            </FluentGridItem>
+            <FluentGridItem lg="3">
+                <p>@Model.QuestionText</p>
+            </FluentGridItem>
+            <FluentGridItem lg="6">
+                @foreach (var Answer in Model.Answers)
+                {
+                    //button appearance is determined by the IsActive property
+                    Appearance buttonAppearance = Answer.IsActive ? Appearance.Accent : Appearance.Neutral;
+
+                        <FluentButton Appearance="@buttonAppearance" 
+                        @onclick="(e => CaptureResponse(e, Answer.AnswerText))">
+                            @Answer.AnswerText
+                        </FluentButton>
+                }
+            </FluentGridItem>
+        </FluentGrid>
+</FluentCard>
+
+@code {
+    [Parameter]
+    public QuestionViewModel? Model { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    private void CaptureResponse(MouseEventArgs e, string value)
+    {
+        //set the button to active and confirm other buttons are not active.
+        foreach (var answer in Model.Answers)
+        {
+            if (answer.AnswerText == value)
+            {
+                answer.IsActive = true;
+                questionState.AddOrUpdateResponse(Model.QuestionCategory, value);
+            }
+            else
+            {
+                answer.IsActive = false;
+            }
+        }
+    }
+}
