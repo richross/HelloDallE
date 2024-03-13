@@ -97,7 +97,7 @@ jobs:
       - name: Access Subscription
         run: |
           az group show -n HelloDallEApp
-          az webapp show -n hellodalle -g HelloDallEApp
+          az webapp show -n ${{ env.AZURE_WEBAPP_NAME }} -g HelloDallEApp
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
