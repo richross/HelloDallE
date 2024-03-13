@@ -81,12 +81,6 @@
 
         try
         {
-            Task.Run(async () =>
-            {
-                questString = await SKQuestions.InvokePromptAsync();
-
-            }).Wait();
-
             questString = await SKQuestions.InvokePromptAsync();
 
             Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questString);
