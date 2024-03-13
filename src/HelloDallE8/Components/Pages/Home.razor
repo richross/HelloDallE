@@ -1,14 +1,17 @@
 ﻿@page "/"
+@attribute [StreamRendering(true)]
+
 @using HelloDallE8.Models;
 @using HelloDallE8.Services;
 @using HelloDallE8.Components;
+@using System.Text.Json;
 
 @inject IDallEComms DallEComms
 @inject IDataService DataService
 @inject ResponseState questionState
 @inject IAzureOpenAISettings aoaiSettings
 
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <PageTitle>Hello DallE</PageTitle>
 
@@ -26,31 +29,31 @@
     </NavMenuContent>
 
     <Body>
-        <div style="margin: 10px">
-            <FluentStack Orientation="Orientation.Vertical"> 
-                @foreach (var Question in Questions)
+        <div style="width:auto">
+            <div style="margin: 10px; width: 500px">
+                @if (Questions.Any())
+                {                    
+                    <FluentStack Orientation="Orientation.Vertical"> 
+                        @foreach (var Question in Questions)
+                        {
+                            <QuestionsComponent Model="@Question">
+                            </QuestionsComponent>
+                        }            
+                    </FluentStack>
+                }
+                else
                 {
-                    <QuestionsComponent Model="@Question">
-                    </QuestionsComponent>
-                }            
-            </FluentStack>
+                    <p>Loading the questions</p>
+                    <FluentProgressRing Visible=true></FluentProgressRing>
+                }
+            </div>
+            <div style="margin: 10px; width: 400 px">
+                <ImageGenerationComponent></ImageGenerationComponent>
+            </div>
         </div>
     </Body>        
         
 </FluentMainLayout>
-
-@* TODO: move this to its own control. *@
-<InputTextArea @bind-Value="DallEComms.PromptText" class="col-12" /><button @onclick="SubmitPrompt">Submit</button><br/>
-
-
-@* TODO: move this to its own control. *@
-@if (DallEComms.LastContentUrl != null)
-{
-    <div id="ImagePromptText">@ImagePromptText</div>
-    <div>
-        <img src="@DallEComms.LastContentUrl" />
-    </div>
-}
 
 @code{
     public Dictionary<string, string> Responses = new Dictionary<string, string>();
@@ -58,46 +61,51 @@
     private List<QuestionViewModel> Questions;
     private string ImagePromptText = "";
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        Questions = DataService.Questions;
+        if (Questions == null)
+        {
+            Questions = new List<QuestionViewModel>();
+            await LoadQuestions();
+        }
 
         questionState.OnResponseChanged += ResponseStateHasChanged;
+    }
+
+    private async Task LoadQuestions()
+    {
+        var SKQuestions = new SemanticKernelGenerateQuestionsService(aoaiSettings);
+
+        SKQuestions.SK_PromptCreation();
+        string questString = string.Empty;
+
+        try
+        {
+            Task.Run(async () =>
+            {
+                questString = await SKQuestions.InvokePromptAsync();
+
+            }).Wait();
+
+            questString = await SKQuestions.InvokePromptAsync();
+
+            Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questString);
+        }
+        catch (JsonException jsonEx)
+        {
+            questString = await SKQuestions.InvokePromptAsync();   
+        }
+        catch (Exception ex)
+        {
+            
+            throw;
+        }
+ 
     }
 
     //method to handle the state change of the response
     private void ResponseStateHasChanged()
     {
         Responses = questionState.Responses;
-    }
-
-    private async Task SubmitPrompt()
-    {
-        var responseValuesCsv = String.Join(",", Responses.Values);
-
-        //take the array of responses and generate a prompt
-
-        var kernel = new SemanticKernelTextCompletionService(aoaiSettings);
-
-        kernel.SK_PromptCreation(responseValuesCsv);
-        var PromptForImage = await kernel.InvokePromptAsync();
-
-        //go get my image!
-        await DallEComms.RequestImage();
-
-        //save the prompt text for display.
-        ImagePromptText = DallEComms.PromptText;
-
-        //clear the text box of the prompt.
-        DallEComms.PromptText = string.Empty;
-
-        // clear QuestionComponent formatting on buttons
-        foreach (var question in Questions)
-        {
-            foreach (var answer in question.Answers)
-            {
-                answer.IsActive = false;
-            }
-        }
     }
 }

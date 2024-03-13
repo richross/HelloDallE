@@ -8,8 +8,8 @@
 
 <FluentCard MinimalStyle=true>
         <FluentGrid Spacing="1">
-            <FluentGridItem lg="3">
-                <h3>@Model.QuestionName</h3>
+            <FluentGridItem lg="2">
+                <h3>@Model.QuestionCategory</h3>
             </FluentGridItem>
             <FluentGridItem lg="3">
                 <p>@Model.QuestionText</p>
@@ -21,7 +21,7 @@
                     Appearance buttonAppearance = Answer.IsActive ? Appearance.Accent : Appearance.Neutral;
 
                         <FluentButton Appearance="@buttonAppearance" 
-                        @onclick="(e => CaptureResponse(e, Answer.AnswerValue))">
+                        @onclick="(e => CaptureResponse(e, Answer.AnswerText))">
                             @Answer.AnswerText
                         </FluentButton>
                 }
@@ -32,11 +32,9 @@
 @code {
     [Parameter]
     public QuestionViewModel? Model { get; set; }
-    private string sectionNumber; //used to detemrine the number of sections based on the number of questions
 
     protected override void OnInitialized()
     {
-        sectionNumber = "col-" + Convert.ToString(12 / Model.Answers.Count);
         base.OnInitialized();
     }
 
@@ -45,10 +43,10 @@
         //set the button to active and confirm other buttons are not active.
         foreach (var answer in Model.Answers)
         {
-            if (answer.AnswerValue == value)
+            if (answer.AnswerText == value)
             {
                 answer.IsActive = true;
-                questionState.AddOrUpdateResponse(Model.QuestionName, value);
+                questionState.AddOrUpdateResponse(Model.QuestionCategory, value);
             }
             else
             {

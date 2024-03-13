@@ -14,7 +14,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 //configuration settings
-builder.Configuration.AddUserSecrets<AzureOpenAISettings>();
+//builder.Configuration.AddUserSecrets<AzureOpenAISettings>();
 
 //AzureOpenAISettings
 builder.Services.AddSingleton<IAzureOpenAISettings>(new AzureOpenAISettings(builder.Configuration));

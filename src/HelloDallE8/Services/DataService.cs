@@ -17,28 +17,26 @@ namespace HelloDallE8.Services
             {
                 new QuestionViewModel()
                 {
-                    QuestionName = "Mood",
-                    QuestionText = "How is your mood today?",
+                    QuestionCategory = "Emotion",
+                    QuestionText = "How are you feeling today?", 
                     Answers = new List<Answer>()
                     {
-                        new Answer() { AnswerText = "Happy", AnswerValue = "happy"},
-                        new Answer() { AnswerText = "Cautious", AnswerValue = "cautious"},
-                        new Answer() { AnswerText = "Optimistic", AnswerValue = "optimistic"}
-                    },
-                    QuestionPrompt = "The image should evoke a mood of {value}. "
+                        new Answer() { AnswerText = "Happy" },
+                        new Answer() { AnswerText = "Cautious"},
+                        new Answer() { AnswerText = "Optimistic"}
+                    }
 
                 },
                 new QuestionViewModel()
                 {
-                    QuestionName = "Color",
+                    QuestionCategory = "Color",
                     QuestionText = "Choose a color for inclusion in the image?",
                     Answers = new List<Answer>()
                     {
-                        new Answer() { AnswerText = "Blue", AnswerValue = "Blue"},
-                        new Answer() { AnswerText = "Red", AnswerValue = "Red"},
-                        new Answer() { AnswerText = "Green", AnswerValue = "Green"}
-                    },
-                    QuestionPrompt = "The image should be based on the primary color of {value}. "
+                        new Answer() { AnswerText = "Blue"},
+                        new Answer() { AnswerText = "Red"},
+                        new Answer() { AnswerText = "Green"}
+                    }
                 }
             };
         }
