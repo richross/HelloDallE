@@ -1,5 +1,5 @@
 param location string = resourceGroup().location
-param appName string = 'HelloDallE-Philly'
+param appName string = 'HelloDallE'
 param storageAccountName string = 'hellodallephilly'
 param vnetName string = 'DallEWorldVnet'
 param subnetName string = 'DallESubnet'
@@ -33,6 +33,7 @@ resource appService 'Microsoft.Web/sites@2022-09-01' = {
   }
 }
 
+*/ 
 // create a virtual network with a subnet for the storage account
 resource vnet 'Microsoft.Network/virtualNetworks@2021-02-01' = {
   name: vnetName
@@ -130,3 +131,6 @@ resource appServiceVnetIntegration 'Microsoft.Web/sites/networkConfig@2022-09-01
     subnetResourceId: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, subnetWebName)
   }
 }
+
+
+\*
