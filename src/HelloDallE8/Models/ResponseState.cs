@@ -1,4 +1,4 @@
-﻿namespace HelloDallE8.Services
+﻿namespace HelloDallE8.Models
 {
     public class ResponseState
     {

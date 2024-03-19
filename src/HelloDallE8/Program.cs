@@ -19,9 +19,12 @@ builder.Services.AddServerSideBlazor();
 //AzureOpenAISettings
 builder.Services.AddSingleton<IAzureOpenAISettings>(new AzureOpenAISettings(builder.Configuration));
 
+//Azure Blob Storage Settings
+builder.Services.AddSingleton<IAzureBlobStorageSettings>(new AzureBlobStorageSettings(builder.Configuration));
+
 builder.Services.AddSingleton<IDataService, DataService>();
-builder.Services.AddScoped<IDallEComms, DallEComms>();
 builder.Services.AddScoped<ResponseState>();
+builder.Services.AddScoped<ImageMetadataState>();
 builder.Services.AddTransient<SemanticKernelTextCompletionService>();
 
 //needed for the FluentUI components

@@ -5,10 +5,10 @@
 @using HelloDallE8.Services;
 @using HelloDallE8.Components;
 @using System.Text.Json;
+@using System.Net;
 
-@inject IDallEComms DallEComms
-@inject IDataService DataService
 @inject ResponseState questionState
+@inject ImageMetadataState imageMetadataState
 @inject IAzureOpenAISettings aoaiSettings
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
@@ -23,9 +23,9 @@
 
     <NavMenuContent>
         <FluentNavLink Href="/" Icon="@(new Icons.Regular.Size24.Home())">Home</FluentNavLink>
-        <FluentNavLink Href="/Questions" Icon="@(new Icons.Regular.Size24.ChatBubblesQuestion())">Questions</FluentNavLink>
+@*         <FluentNavLink Href="/Questions" Icon="@(new Icons.Regular.Size24.ChatBubblesQuestion())">Questions</FluentNavLink>
         <FluentNavLink Href="/Design" Icon="@(new Icons.Regular.Size24.DesignIdeas())">Design</FluentNavLink>
-        <FluentNavLink Href="/About" Icon="@(new Icons.Regular.Size24.Archive())">About</FluentNavLink>
+*@        <FluentNavLink Href="/About" Icon="@(new Icons.Regular.Size24.Archive())">About</FluentNavLink>
     </NavMenuContent>
 
     <Body>
@@ -84,10 +84,20 @@
             questString = await SKQuestions.InvokePromptAsync();
 
             Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questString);
+
+            //if successful, write to the imagemetadatastate object
+            // string encodedQuestString = WebUtility.UrlEncode(questString.Trim());
+            // imageMetadataState.AddOrUpdateMetadata(ImageMetadataValues.LLMQuestions, 
+            //     JsonSerializer.Serialize(questString));
+
         }
         catch (JsonException jsonEx)
         {
-            questString = await SKQuestions.InvokePromptAsync();   
+            questString = await SKQuestions.InvokePromptAsync(); 
+            Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questString);
+
+            //if successful, write to the imagemetadatastate object
+            // imageMetadataState.AddOrUpdateMetadata(ImageMetadataValues.LLMQuestions, questString);
         }
         catch (Exception ex)
         {

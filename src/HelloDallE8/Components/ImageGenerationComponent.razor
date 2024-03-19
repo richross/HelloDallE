@@ -1,8 +1,12 @@
-﻿@using HelloDallE8.Models;
+﻿@using Azure.Storage.Blobs.Models
+@using HelloDallE8.Models;
 @using HelloDallE8.Services;
+@using Azure.Storage.Blobs;
 
 @inject IAzureOpenAISettings aoaiSettings;
+@inject IAzureBlobStorageSettings blobSettings;
 @inject ResponseState questionState;
+@inject ImageMetadataState metadataState;
 
 @rendermode InteractiveServer
 
@@ -14,7 +18,7 @@
     <img src="@ImageUrlFromDallE" />
 </FluentCard>
 
-@code {    
+@code {
 
     private bool LoadingImage = false;
     private string PromptForImage = string.Empty; 
@@ -23,20 +27,76 @@
     {
         LoadingImage = true;
 
-        var responseValuesCsv = String.Join(",", questionState.Responses.Values);
+        try
+        {
+            var responseValuesCsv = String.Join(",", questionState.Responses.Values);
+            metadataState.AddOrUpdateMetadata(ImageMetadataValues.ResponsesCsv, responseValuesCsv);
 
-        //take the array of responses and generate a prompt
+            //take the array of responses and generate a prompt
 
-        var kernel = new SemanticKernelTextCompletionService(aoaiSettings);
+            var kernel = new SemanticKernelTextCompletionService(aoaiSettings);
 
-        kernel.SK_PromptCreation(responseValuesCsv);
-        PromptForImage = await kernel.InvokePromptAsync();
+            kernel.SK_PromptCreation(responseValuesCsv);
+            PromptForImage = await kernel.InvokePromptAsync();
 
-        //go get my image!
-        var imageKernel = new SemanticKernelTextToImageService(aoaiSettings);
-        imageKernel.SK_PromptCreation(PromptForImage);
-        ImageUrlFromDallE = await imageKernel.InvokePromptAsync();
+            metadataState.AddOrUpdateMetadata(ImageMetadataValues.ImagePrompt, PromptForImage);
+
+            //go get my image!
+            var imageKernel = new SemanticKernelTextToImageService(aoaiSettings);
+            imageKernel.SK_PromptCreation(PromptForImage);
+            ImageUrlFromDallE = await imageKernel.InvokePromptAsync();
+
+            await SaveImageToBlob(ImageUrlFromDallE);
+
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
 
         LoadingImage = false;
+    }
+
+    private async Task SaveImageToBlob(string ImageUrl)
+    {
+        try
+        {
+            //connect to our blob storage and save the image
+            var blobServiceClient = new BlobServiceClient(blobSettings.BlobStorageConnectionString);
+            var containerClient = blobServiceClient.GetBlobContainerClient(blobSettings.ContainerName);
+
+            // Ensure the container exists.
+            await containerClient.CreateIfNotExistsAsync();
+
+            //provide an image name based on the current date and time.
+            var blobClient = containerClient.GetBlobClient($"{DateTime.UtcNow.ToString("yyyyMMddHHmmss")}-image.png");
+
+            using (var httpClient = new HttpClient())
+            {
+                using (var response = await httpClient.GetAsync(ImageUrl))
+                {
+                    using (var stream = await response.Content.ReadAsStreamAsync())
+                    {
+                        var contentLength = stream.Length;
+
+                        await blobClient.UploadAsync(stream, new BlobUploadOptions()
+                        {
+                            Metadata = metadataState.Metadata,
+                            TransferOptions = new Azure.Storage.StorageTransferOptions()
+                            {
+                                MaximumTransferSize = contentLength
+                            }
+
+                        });
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            
+            throw;
+        }
     }
 }
