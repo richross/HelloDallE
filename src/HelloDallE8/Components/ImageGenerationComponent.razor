@@ -10,7 +10,7 @@
 
 @rendermode InteractiveServer
 
-<FluentTextArea @bind-Value="PromptForImage" Label="Prompt generated from your answers:" Rows="4" Style="width: 500px"/>
+<FluentTextArea @bind-Value="PromptForImage" Rows="4" Style="width: 500px"/>
 <FluentButton Appearance="Appearance.Lightweight" @onclick="GeneratePrompt" Value="Generate">@GenerateButtonText</FluentButton>
 <FluentButton Appearance="Appearance.Lightweight" @onclick="SubmitPrompt">Submit</FluentButton>
 <br />
