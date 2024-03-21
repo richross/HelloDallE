@@ -11,13 +11,16 @@
     //create or update the value of the rpovided key
     public void AddOrUpdateMetadata(string key, string value)
     {
-        if (Metadata.ContainsKey(key))
+        string urlEncodedKey = System.Net.WebUtility.UrlEncode(key);
+        string urlEncodedValue = System.Net.WebUtility.UrlEncode(value);
+
+        if (Metadata.ContainsKey(urlEncodedKey))
         {
-            Metadata[key] = value;
+            Metadata[urlEncodedKey] = urlEncodedValue;
         }
         else
         {
-            Metadata.Add(key, value);
+            Metadata.Add(urlEncodedKey, urlEncodedValue);
         }
 
         OnMetadataChanged?.Invoke();

@@ -85,10 +85,8 @@
 
             Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questString);
 
-            //if successful, write to the imagemetadatastate object
-            // string encodedQuestString = WebUtility.UrlEncode(questString.Trim());
-            // imageMetadataState.AddOrUpdateMetadata(ImageMetadataValues.LLMQuestions, 
-            //     JsonSerializer.Serialize(questString));
+            // if successful, write to the imagemetadatastate object
+            imageMetadataState.AddOrUpdateMetadata(ImageMetadataValues.LLMQuestions, questString.Trim());
 
         }
         catch (JsonException jsonEx)
@@ -97,7 +95,7 @@
             Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questString);
 
             //if successful, write to the imagemetadatastate object
-            // imageMetadataState.AddOrUpdateMetadata(ImageMetadataValues.LLMQuestions, questString);
+            imageMetadataState.AddOrUpdateMetadata(ImageMetadataValues.LLMQuestions, questString.Trim());
         }
         catch (Exception ex)
         {
