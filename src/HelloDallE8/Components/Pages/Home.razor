@@ -30,7 +30,8 @@
 
     <Body>
         <div style="width:auto">
-            <div style="margin: 10px; width: 500px">
+            <div style="margin: 10px;">
+                <div style="width: 60%;float:left">
                 @if (Questions.Any())
                 {                    
                     <FluentStack Orientation="Orientation.Vertical"> 
@@ -46,8 +47,13 @@
                     <p>Loading the questions</p>
                     <FluentProgressRing Visible=true></FluentProgressRing>
                 }
+                </div>
+                <div style="float: right">
+                    <FluentTextArea @bind-value=questionsFromGenAI Rows=30 Cols="50" Style="width:400px" />
+                </div>
             </div>
-            <div style="margin: 10px; width: 400 px">
+            <br/>
+            <div style="margin: 10px; width:600px">
                 <ImageGenerationComponent></ImageGenerationComponent>
             </div>
         </div>
@@ -59,7 +65,7 @@
     public Dictionary<string, string> Responses = new Dictionary<string, string>();
 
     private List<QuestionViewModel> Questions;
-    private string ImagePromptText = "";
+    private string questionsFromGenAI;
 
     protected override async Task OnInitializedAsync()
     {
@@ -77,27 +83,24 @@
         var SKQuestions = new SemanticKernelGenerateQuestionsService(aoaiSettings);
 
         SKQuestions.SK_PromptCreation();
-        string questString = string.Empty;
 
         try
         {
-            questString = await SKQuestions.InvokePromptAsync();
+            questionsFromGenAI = await SKQuestions.InvokePromptAsync();
 
-            Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questString);
+            Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questionsFromGenAI);
 
-            //if successful, write to the imagemetadatastate object
-            // string encodedQuestString = WebUtility.UrlEncode(questString.Trim());
-            // imageMetadataState.AddOrUpdateMetadata(ImageMetadataValues.LLMQuestions, 
-            //     JsonSerializer.Serialize(questString));
+            // if successful, write to the imagemetadatastate object
+            imageMetadataState.AddOrUpdateMetadata(ImageMetadataValues.LLMQuestions, questionsFromGenAI.Trim());
 
         }
         catch (JsonException jsonEx)
         {
-            questString = await SKQuestions.InvokePromptAsync(); 
-            Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questString);
+            questionsFromGenAI = await SKQuestions.InvokePromptAsync();
+            Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questionsFromGenAI);
 
             //if successful, write to the imagemetadatastate object
-            // imageMetadataState.AddOrUpdateMetadata(ImageMetadataValues.LLMQuestions, questString);
+            imageMetadataState.AddOrUpdateMetadata(ImageMetadataValues.LLMQuestions, questionsFromGenAI.Trim());
         }
         catch (Exception ex)
         {
