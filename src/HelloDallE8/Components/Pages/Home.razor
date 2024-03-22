@@ -31,29 +31,31 @@
     <Body>
         <div style="width:auto">
             <div style="margin: 10px;">
-                <div style="width: 60%;float:left">
-                @if (Questions.Any())
-                {                    
-                    <FluentStack Orientation="Orientation.Vertical"> 
-                        @foreach (var Question in Questions)
+                <FluentTabs>
+                    <FluentTab Label="Questions">
+                        @if (Questions.Any())
                         {
-                            <QuestionsComponent Model="@Question">
-                            </QuestionsComponent>
-                        }            
-                    </FluentStack>
-                }
-                else
-                {
-                    <p>Loading the questions</p>
-                    <FluentProgressRing Visible=true></FluentProgressRing>
-                }
-                </div>
-                <div style="float: right">
-                    <FluentTextArea @bind-value=questionsFromGenAI Rows=30 Cols="50" Style="width:400px" />
-                </div>
+                            <FluentStack Orientation="Orientation.Vertical">
+                                @foreach (var Question in Questions)
+                                {
+                                    <QuestionsComponent Model="@Question">
+                                    </QuestionsComponent>
+                                }
+                            </FluentStack>
+                        }
+                        else
+                        {
+                            <p>Loading the questions</p>
+                            <FluentProgressRing Visible=true></FluentProgressRing>
+                        }
+                    </FluentTab>
+                    <FluentTab Label="Design">
+                        <FluentTextArea @bind-value=questionsFromGenAI Rows=30 Cols="50" Style="width:400px" />
+                    </FluentTab>
+                </FluentTabs>
             </div>
             <br/>
-            <div style="margin: 10px; width:600px">
+            <div style="margin: 10px;">
                 <ImageGenerationComponent></ImageGenerationComponent>
             </div>
         </div>
