@@ -1,0 +1,49 @@
+﻿@page "/About"
+
+<FluentMainLayout NavMenuTitle="Navigation">
+
+    <Header>
+        <h1>Hello DallE Experience</h1>
+    </Header>
+
+    <NavMenuContent>
+        <FluentNavLink Href="/" Icon="@(new Icons.Regular.Size24.Home())">Home</FluentNavLink>
+@*         <FluentNavLink Href="/Questions" Icon="@(new Icons.Regular.Size24.ChatBubblesQuestion())">Questions</FluentNavLink>
+        <FluentNavLink Href="/Design" Icon="@(new Icons.Regular.Size24.DesignIdeas())">Design</FluentNavLink>
+*@        <FluentNavLink Href="/About" Icon="@(new Icons.Regular.Size24.Archive())">About</FluentNavLink>
+    </NavMenuContent>
+    <Body>
+        <FluentBodyContent>
+            <h3>About Hello DallE</h3>
+            <p>Hello DallE is a project created to showcase the capabilities of Azure AI Services. All of the data presented in this application is provided by making requests to the Azure OpenAI Service and using the response.</p>
+            <br/>
+            <h4>Generate Questions</h4>
+            <p><b>The following prompt provides the questions generated at page load.</b></p>
+            <p>Generate a JSON object that represents a collection of questions and answers that will be used to describe an image the user wants to create with the DallE service. 
+                <p>The collection should contain at least 5 questions.</p>
+                <p>Each question should have 4-5 choices and each choice is 1 or 2 words. </p>
+                <p>Do not include questions that ask about image size. </p>
+                <p>Do not output the questions as a numbered list. </p>
+                <p>Only respond with a JSON object. </p>
+                <p>All responses will be in the following JSON format:</p>
+                <p>[{{""QuestionCategory"": ""Color"",""QuestionText"": ""What is your favorite color?"",""Answers"": [{{""AnswerText"":""Red""}},{{""AnswerText"":""Blue""}},{{""AnswerText"":""Green""}},{{""AnswerText"":""Yellow""}},{{""AnswerText"":""Azure""}}]}}]
+                </p>
+                Questions:
+            </p>
+            <br/>   
+            <h4>Generate Image Prompt</h4>
+            <p><b>The following prompt generates the prompt used to create the image based on the responses of the user.</b></p>
+            <p>Instructions: Generate a text prompt that will be passed to DallE to generate an image using that description. 
+                <p>The prompt should be based on these descriptors of an image <b>{usersAnswersCsv}</b>.</p>
+            
+                TextPrompt:</p>
+            <br/>
+            <h4>Generated Image</h4>
+
+        </FluentBodyContent>
+    </Body>
+
+</FluentMainLayout>
+@code {
+
+}
