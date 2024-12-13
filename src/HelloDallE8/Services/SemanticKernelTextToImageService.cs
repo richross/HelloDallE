@@ -11,12 +11,12 @@ namespace HelloDallE8.Services
 
         public SemanticKernelTextToImageService(IAzureOpenAISettings aoaiSettings)
         {
-        #pragma warning disable SKEXP0012 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        #pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             kernel = Kernel.CreateBuilder()
                 .AddAzureOpenAITextToImage(aoaiSettings.DalleServiceDeploymentName, aoaiSettings.AoaiEndPoint, aoaiSettings.ApiKey)
-                .AddAzureOpenAITextGeneration(aoaiSettings.DeploymentName, aoaiSettings.AoaiEndPoint, aoaiSettings.ApiKey)
+                .AddAzureOpenAIChatCompletion(aoaiSettings.DeploymentName, aoaiSettings.AoaiEndPoint, aoaiSettings.ApiKey)
                 .Build();
-        #pragma warning restore SKEXP0012 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        #pragma warning restore SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         }
         
         public void SK_PromptCreation(string ImagePrompt)
@@ -29,10 +29,10 @@ namespace HelloDallE8.Services
             string result = string.Empty;
             try
             {
-            #pragma warning disable SKEXP0002 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
                 ITextToImageService dallE = kernel.GetRequiredService<ITextToImageService>();
                 var image = await dallE.GenerateImageAsync(Prompt, 1024, 1024);
-            #pragma warning restore SKEXP0002 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
                 
                 var funcResult = await kernel.InvokePromptAsync(Prompt);
 

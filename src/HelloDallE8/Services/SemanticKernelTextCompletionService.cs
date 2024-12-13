@@ -13,7 +13,7 @@ namespace HelloDallE8.Services
         public SemanticKernelTextCompletionService(IAzureOpenAISettings aoaiSettings)
         {
             kernel = Kernel.CreateBuilder()
-                .AddAzureOpenAITextGeneration(aoaiSettings.DeploymentName, aoaiSettings.AoaiEndPoint, aoaiSettings.ApiKey)
+                .AddAzureOpenAIChatCompletion(aoaiSettings.DeploymentName, aoaiSettings.AoaiEndPoint, aoaiSettings.ApiKey)
                 .Build();
             
         }
