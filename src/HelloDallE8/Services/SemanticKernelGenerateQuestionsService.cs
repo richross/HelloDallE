@@ -11,8 +11,11 @@ namespace HelloDallE8.Services
 
         public SemanticKernelGenerateQuestionsService(IAzureOpenAISettings aoaiSettings)
         {
+            var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", aoaiSettings.OcpApimSubscriptionKey);
+
             kernel = Kernel.CreateBuilder()
-                .AddAzureOpenAIChatCompletion(aoaiSettings.DeploymentName, aoaiSettings.AoaiEndPoint, aoaiSettings.ApiKey)
+                .AddAzureOpenAIChatCompletion(aoaiSettings.DeploymentName, aoaiSettings.AoaiEndPoint, aoaiSettings.ApiKey, null, null, httpClient, aoaiSettings.ApiVersion)
                 .Build();
 
         }
