@@ -2,6 +2,7 @@
 @attribute [StreamRendering]
 
 @using HelloDallE8.Models;
+@using HelloDallE8.Prompts
 @using HelloDallE8.Services;
 @using HelloDallE8.Components;
 @using System.Text.Json;
@@ -54,16 +55,16 @@
                     </FluentTab>
                 </FluentTabs>
             </div>
-            <br/>
+            <br />
             <div style="margin: 10px;">
                 <ImageGenerationComponent></ImageGenerationComponent>
             </div>
         </div>
-    </Body>        
-        
+    </Body>
+
 </FluentMainLayout>
 
-@code{
+@code {
     public Dictionary<string, string> Responses = new Dictionary<string, string>();
 
     private List<QuestionViewModel> Questions;
@@ -82,15 +83,16 @@
 
     private async Task LoadQuestions()
     {
-        var SKQuestions = new SemanticKernelGenerateQuestionsService(aoaiSettings);
-
-        SKQuestions.SK_PromptCreation();
+        var SKQuestions = new SemanticKernelChatCompletionService(aoaiSettings, new QuestionsPromptConfiguration().promptTemplateConfig);
 
         try
         {
             questionsFromGenAI = await SKQuestions.InvokePromptAsync();
 
-            Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questionsFromGenAI);
+            if (!string.IsNullOrEmpty(questionsFromGenAI))
+            {
+                Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questionsFromGenAI);
+            }
 
             // if successful, write to the imagemetadatastate object
             imageMetadataState.AddOrUpdateMetadata(ImageMetadataValues.LLMQuestions, questionsFromGenAI.Trim());
@@ -99,17 +101,19 @@
         catch (JsonException jsonEx)
         {
             questionsFromGenAI = await SKQuestions.InvokePromptAsync();
-            Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questionsFromGenAI);
+
+            if (!string.IsNullOrEmpty(questionsFromGenAI))
+            {
+                Questions = JsonSerializer.Deserialize<List<QuestionViewModel>>(questionsFromGenAI);
+            }
 
             //if successful, write to the imagemetadatastate object
             imageMetadataState.AddOrUpdateMetadata(ImageMetadataValues.LLMQuestions, questionsFromGenAI.Trim());
         }
         catch (Exception ex)
         {
-            
             throw;
         }
- 
     }
 
     //method to handle the state change of the response

@@ -1,5 +1,6 @@
 ﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.TextToImage;
+using System.Net.Http;
 
 namespace HelloDallE8.Services
 {
@@ -7,21 +8,30 @@ namespace HelloDallE8.Services
     {
         private Kernel kernel;
 
-        private string Prompt { get; set; } = string.Empty;
+        private PromptTemplateConfig promptTemplateConfig { get; set; }
+        private HttpClient httpClient;
 
         public SemanticKernelTextToImageService(IAzureOpenAISettings aoaiSettings)
         {
-        #pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", aoaiSettings.OcpApimSubscriptionKey);
+
+            #pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
             kernel = Kernel.CreateBuilder()
-                .AddAzureOpenAITextToImage(aoaiSettings.DalleServiceDeploymentName, aoaiSettings.AoaiEndPoint, aoaiSettings.ApiKey)
-                .AddAzureOpenAIChatCompletion(aoaiSettings.DeploymentName, aoaiSettings.AoaiEndPoint, aoaiSettings.ApiKey)
+                .AddAzureOpenAITextToImage(aoaiSettings.DalleServiceDeploymentName, aoaiSettings.AoaiEndPoint,aoaiSettings.ApiKey,null,null, aoaiSettings.DalleApiVersion, httpClient)
                 .Build();
-        #pragma warning restore SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
+            #pragma warning restore SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
+            promptTemplateConfig = new PromptTemplateConfig(); // Initialize the property to avoid CS8618
         }
-        
-        public void SK_PromptCreation(string ImagePrompt)
+
+        public SemanticKernelTextToImageService(IAzureOpenAISettings aoaiSettings, PromptTemplateConfig _promptTemplateConfig)
+            : this(aoaiSettings)
         {
-            Prompt = @$"{ImagePrompt}";
+            promptTemplateConfig = _promptTemplateConfig;
+            kernel.CreateFunctionFromPrompt(promptTemplateConfig);
         }
 
         public async Task<string> InvokePromptAsync()
@@ -29,15 +39,14 @@ namespace HelloDallE8.Services
             string result = string.Empty;
             try
             {
-            #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
                 ITextToImageService dallE = kernel.GetRequiredService<ITextToImageService>();
-                var image = await dallE.GenerateImageAsync(Prompt, 1024, 1024);
-            #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-                
-                var funcResult = await kernel.InvokePromptAsync(Prompt);
+                var image = await dallE.GenerateImageAsync(promptTemplateConfig.Template, 1024, 1024);
+
+#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
                 result = image;
-                
             }
             catch (Exception ex)
             {
@@ -46,6 +55,5 @@ namespace HelloDallE8.Services
 
             return result;
         }
-
     }
 }

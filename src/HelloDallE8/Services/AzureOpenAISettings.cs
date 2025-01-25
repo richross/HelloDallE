@@ -8,6 +8,7 @@
         string DalleServiceDeploymentName { get; set; }
         string OcpApimSubscriptionKey { get; set; }
         string ApiVersion { get; set; }
+        string DalleApiVersion { get; set; }
     }
 
     public class AzureOpenAISettings : IAzureOpenAISettings
@@ -22,6 +23,7 @@
         public string AoaiEndPoint { get; set; }
         public string DalleServiceDeploymentName { get; set; }
         public string ApiVersion { get; set; }
+        public string DalleApiVersion { get; set; }
 
         public AzureOpenAISettings(IConfiguration config)
         {
@@ -31,6 +33,7 @@
             AoaiEndPoint = config["AzureOpenAISettings:AoaiEndPoint"];
             DalleServiceDeploymentName = config["AzureOpenAISettings:DalleServiceDeploymentName"];
             ApiVersion = config["AzureOpenAISettings:ApiVersion"];
+            DalleApiVersion = config["AzureOpenAISettings:DalleApiVersion"];
         }
 
     }

@@ -5,6 +5,8 @@ using Microsoft.FluentUI.AspNetCore.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -25,7 +27,6 @@ builder.Services.AddSingleton<IAzureBlobStorageSettings>(new AzureBlobStorageSet
 builder.Services.AddSingleton<IDataService, DataService>();
 builder.Services.AddScoped<ResponseState>();
 builder.Services.AddScoped<ImageMetadataState>();
-builder.Services.AddTransient<SemanticKernelTextCompletionService>();
 
 //needed for the FluentUI components
 
@@ -35,6 +36,8 @@ builder.Services.AddTransient<SemanticKernelTextCompletionService>();
 builder.Services.AddFluentUIComponents();
 
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

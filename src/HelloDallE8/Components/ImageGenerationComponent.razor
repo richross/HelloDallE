@@ -1,5 +1,6 @@
 ﻿@using Azure.Storage.Blobs.Models
 @using HelloDallE8.Models;
+@using HelloDallE8.Prompts
 @using HelloDallE8.Services;
 @using Azure.Storage.Blobs;
 
@@ -18,7 +19,7 @@
     <FluentProgressRing Visible="@LoadingImage" />
     <img src="@ImageUrlFromDallE" />
 </FluentCard>
-    
+
 @code {
 
     private bool LoadingImage = false;
@@ -36,10 +37,10 @@
             metadataState.AddOrUpdateMetadata(ImageMetadataValues.ResponsesCsv, responseValuesCsv);
 
             //take the array of responses and generate a prompt
+            var answersPromptConfig = new AnswersPromptConfiguration(responseValuesCsv);
 
-            var kernel = new SemanticKernelTextCompletionService(aoaiSettings);
+            var kernel = new SemanticKernelChatCompletionService(aoaiSettings, answersPromptConfig.promptTemplateConfig);
 
-            kernel.SK_PromptCreation(responseValuesCsv);
             PromptForImage = await kernel.InvokePromptAsync();
 
             metadataState.AddOrUpdateMetadata(ImageMetadataValues.ImagePrompt, PromptForImage);
@@ -61,13 +62,14 @@
 
         try
         {
+            //create the promptTemplateConfiguration
+            var imagePromptConfig = new ImagePromptConfiguration(PromptForImage);
 
             //go get my image!
-            var imageKernel = new SemanticKernelTextToImageService(aoaiSettings);
-            imageKernel.SK_PromptCreation(PromptForImage);
+            var imageKernel = new SemanticKernelTextToImageService(aoaiSettings, imagePromptConfig.promptTemplateConfiguration);
             ImageUrlFromDallE = await imageKernel.InvokePromptAsync();
 
-            await SaveImageToBlob(ImageUrlFromDallE);
+            // await SaveImageToBlob(ImageUrlFromDallE);
 
         }
         catch (Exception ex)
